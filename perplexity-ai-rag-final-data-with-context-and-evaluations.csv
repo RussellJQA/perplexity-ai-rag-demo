@@ -1,0 +1,4003 @@
+question,reference_answer,generated_answer,context,Faithfulness,Faithfulness reasoning,Contradictions,Contradictions reasoning
+What is the method for excluding specific domains from search results in the provided context?,"To exclude specific domains from search results, use the `search_domain_filter` parameter in your request and prefix the domain names with a minus sign (`-`). For example:
+
+```json
+""search_domain_filter"": [
+    ""-example.com""
+]
+```","To exclude specific domains from search results in the provided context, you can use the `search_domain_filter` feature by prefixing the domain name with a minus sign (`-`). 
+
+Here's how you would include it in a request payload:
+
+```json
+""search_domain_filter"": [
+    ""-example.com""
+]
+```
+
+This will filter out any results from `example.com`. You can include multiple domains to exclude by adding more entries to the list, ensuring each is prefixed with the minus sign.","**Pro-tip**: Use `high` for research-heavy or nuanced queries where coverage matters more than cost.
+
+⸻
+
+
+# Search Domain Filter Guide
+Source: https://docs.perplexity.ai/guides/search-domain-filters
+
+<Note>
+  The `search_domain_filter` feature allows you to limit search results to specific domains or exclude certain domains from search results.
+</Note>
+
+<Warning>
+  You can add a maximum of 10 domains to the `search_domain_filter` list.
+</Warning>
+
+## Overview
+
+The `search_domain_filter` parameter allows you to control which websites are included in or excluded from the search results used by the Sonar models. This feature is particularly useful when you want to:
+
+* Restrict search results to trusted sources
+* Filter out specific domains from search results
+* Focus research on particular websites
+
+Enabling domain filtering can be done by adding a `search_domain_filter` field in the request:
+
+```
+""search_domain_filter"": [
+  ""<domain1>"",
+  ""<domain2>"",
+  ...
+]
+```
+
+Each entry in the list should be a simple domain name. To exclude a domain, prefix it with a minus sign (`-`).
+
+## Examples
+
+### 1. Allowlist Specific Domains
+
+This example shows how to limit search results to only include content from specific domains.
+
+**Request**
+
+```python
+import requests
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar-reasoning-pro"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""You are a helpful assistant.""},
+        {""role"": ""user"", ""content"": ""Tell me about the James Webb Space Telescope discoveries.""}
+    ],
+    ""search_domain_filter"": [
+        ""nasa.gov"",
+        ""wikipedia.org"",
+        ""space.com""
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Best Practice**: Use simple domain names (e.g., `wikipedia.org`) without additional elements like `https://` or `www.` prefixes.
+
+### 2. Denylist Specific Domains
+
+This example shows how to exclude specific domains from search results by prefixing the domain name with a minus sign (`-`).
+
+**Request**
+
+```python
+import requests
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar-deep-research"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""You are a helpful assistant.""},
+        {""role"": ""user"", ""content"": ""What are the latest advancements in renewable energy?""}
+    ],
+    ""search_domain_filter"": [
+        ""-pinterest.com"",
+        ""-reddit.com"",
+        ""-quora.com""
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Best Practice**: Use simple domain names with a minus prefix (e.g., `-pinterest.com`) to exclude domains from search results.
+
+## Best Practices
+
+### Domain Specification
+**Good Example**: ""Compare the energy efficiency ratings of heat pumps vs. traditional HVAC systems for residential use""
+
+    **Poor Example**: ""Tell me which home heating is better""
+  </Card>
+
+  <Card title=""Provide Relevant Context"">
+    Include critical context to guide the web search toward the most relevant content, but keep prompts concise and focused.
+
+    **Good Example**: ""Explain the impact of the 2023 EU digital markets regulations on app store competition for small developers""
+
+    **Poor Example**: ""What are the rules for app stores?""
+  </Card>
+</CardGroup>
+
+## Web Search Model Pitfalls to Avoid
+
+<CardGroup cols={2}>
+  <Card title=""Overly Generic Questions"">
+    Generic prompts lead to scattered web search results and unfocused responses. Always narrow your scope.
+
+    **Avoid**: ""What's happening in AI?""
+
+    **Instead**: ""What are the three most significant commercial applications of generative AI in healthcare in the past year?""
+  </Card>
+
+  <Card title=""Traditional LLM Techniques"">
+    Prompting strategies designed for traditional LLMs often don't work well with web search models. Adapt your approach accordingly.
+
+    **Avoid**: ""Act as an expert chef and give me a recipe for sourdough bread. Start by explaining the history of sourdough, then list ingredients, then...""
+
+    **Instead**: ""What's a reliable sourdough bread recipe for beginners? Include ingredients and step-by-step instructions.""
+  </Card>
+
+  <Card title=""Complex Multi-Part Requests"">
+    Complex prompts with multiple unrelated questions can confuse the search component. Focus on one topic per query.
+
+    **Avoid**: ""Explain quantum computing, and also tell me about regenerative agriculture, and provide stock market predictions.""
+
+    **Instead**: ""Explain quantum computing principles that might impact cryptography in the next decade.""
+  </Card>
+
+  <Card title=""Assuming Search Intent"">
+    Don't assume the model will search for what you intended without specific direction. Be explicit about exactly what information you need.
+
+    **Avoid**: ""Tell me about the latest developments.""
+
+    **Instead**: ""What are the latest developments in offshore wind energy technology announced in the past 6 months?""
+  </Card>
+</CardGroup>
+
+### Advanced Techniques
+
+<Tip>
+  We recommend for users *not* to tune language parameters such as `temperature`, as the default settings for these have already been optimized.
+</Tip>
+
+<CardGroup cols={1}>
+  <Card title=""Parameter Optimization"">
+    Adjust model parameters based on your specific needs:
+
+    * **Search Domain Filter**: Limit results to trusted sources for research-heavy queries.
+    * **Search Context Size**: Use ""high"" for comprehensive research questions and ""low"" for simple factual queries.
+
+    Example configuration for technical documentation:
+
+    ```json
+    {
+      ""search_domain_filter"": [""wikipedia.org"", ""docs.python.org""],
+      ""web_search_options"": {
+        ""search_context_size"": ""medium""
+      }
+    }
+    ```
+  </Card>
+</CardGroup>
+
+### Tips for Different Query Types
+⸻
+
+## Examples
+
+### 1. Exclude Specific Image Domains
+
+This request filters out images from Getty Images.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_domain_filter"": [""-gettyimages.com""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me images of Mount Everest""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_domain_filter"": [""-gettyimages.com""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me images of Mount Everest""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+### 2. Only Return GIFs
+
+This request restricts results to GIF images.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_format_filter"": [""gif""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me a funny cat gif""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_format_filter"": [""gif""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me a funny cat gif""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+## 3. Combine Domain and Format Filters
+
+You can combine both filters for precise control.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_domain_filter"": [""-gettyimages.com""],
+      ""image_format_filter"": [""gif""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me a gif of a dog""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_domain_filter"": [""-gettyimages.com""],
+    ""image_format_filter"": [""gif""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me a gif of a dog""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+## Best Practices
+### Tips for Different Query Types
+
+| Query Type              | Best Practices                                                                                                                         |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| **Factual Research**    | • Use specific questions  • Use search domain filters for academic sources  • Consider ""high"" search context size                      |
+| **Creative Content**    | • Provide detailed style guidelines in system prompt  • Specify tone, voice, and audience                                              |
+| **Technical Questions** | • Include relevant technical context  • Specify preferred programming language/framework  • Use domain filters for documentation sites |
+| **Analysis & Insights** | • Request step-by-step reasoning  • Ask for specific metrics or criteria                                                               |
+
+
+# Search Context Size
+Source: https://docs.perplexity.ai/guides/search-context-size-guide
+
+<Note>
+  The `search_context_size` parameter allows you to control how much search context is retrieved from the web during query resolution, letting you balance cost and comprehensiveness.
+</Note>
+
+<Warning>
+  * Default `search_context_size` is `low`
+  * Selecting `""high""` increases search costs due to more extensive web retrieval. Use `""low""` when cost efficiency is critical.
+</Warning>
+
+## Overview
+
+The `search_context_size` field—passed via the `web_search_options` object—determines how much search context is retrieved by the Sonar models. This setting can help you optimize for either:
+
+* Cost savings with minimal search input (`low`)
+* Comprehensive answers by maximizing retrieved information (`high`)
+* A balance of both (`medium`)
+
+This flexibility allows teams to tune their API usage to their budget and use case.
+
+To enable this feature, include the web\_search\_options.search\_context\_size parameter in your request payload:
+
+```bash
+""web_search_options"": {
+  ""search_context_size"": ""medium""
+}
+```
+
+## Best Practices
+
+**Choosing the Right Context Size**
+
+* `low`: Best for short factual queries or when operating under strict token cost constraints.
+* `medium`: The default and best suited for general use cases.
+* `high`: Use for deep research, exploratory questions, or when citations and evidence coverage are critical.
+
+**Cost Optimization**
+
+* Selecting `low` or `medium` can significantly reduce overall token usage, especially at scale.
+* Consider defaulting to `low` for high-volume endpoints and selectively upgrading to `high` for complex user prompts.
+
+Combining with Other Filters
+
+* You can use `search_context_size` alongside other features like `search_domain_filter` to further control the scope of search.
+* Combining `medium` with a focused domain filter often gives a good tradeoff between quality and cost.
+
+Performance Considerations
+**Best Practice**: Use simple domain names with a minus prefix (e.g., `-pinterest.com`) to exclude domains from search results.
+
+## Best Practices
+
+### Domain Specification
+
+* **Use simple domain names**: Specify domains in their simplest form (e.g., `example.com`) without protocol prefixes (`http://`, `https://`) or subdomain specifiers (`www.`).
+* **Main domains only**: Using the main domain (e.g., `nytimes.com`) will filter all subdomains as well.
+
+### Filter Optimization
+
+* **Be specific**: Use domains that are most relevant to your query to get the best results.
+* **Combine approaches**: You can mix inclusion and exclusion in the same request (e.g., `[""wikipedia.org"", ""-pinterest.com""]`).
+* **Limit filter size**: Although you can add up to 10 domains, using fewer, more targeted domains often yields better results.
+
+### Performance Considerations
+
+* Adding domain filters may slightly increase response time as the search engine needs to apply additional filtering.
+* Overly restrictive domain filters might result in fewer search results, potentially affecting the quality of the response.
+
+
+# Structured Outputs Guide
+Source: https://docs.perplexity.ai/guides/structured-outputs
+
+<Info>
+  The first request with a new JSON Schema or Regex expects to incur delay on the first token. Typically, it takes 10 to 30 seconds to prepare the new schema, and may result in timeout errors. Once the schema has been prepared, the subsequent requests will not see such delay.
+</Info>
+
+## Overview
+
+We currently support two types of structured outputs: **JSON Schema** and **Regex**. LLM responses will work to match the specified format, except for the following cases:
+
+* The output exceeds `max_tokens`
+
+Enabling the structured outputs can be done by adding a `response_format` field in the request:
+
+**JSON Schema**
+
+* `response_format: { type: ""json_schema"", json_schema: {""schema"": object} }` .
+
+* The schema should be a valid JSON schema object.
+
+**Regex** (only available for `sonar` right now)
+
+* `response_format: { type: ""regex"", regex: {""regex"": str} }` .
+
+* The regex is a regular expression string.
+
+We recommend to give the LLM some hints about the output format in the prompts.
+
+## Examples
+
+### 1. Get a response in JSON format
+
+**Request**
+
+```python
+import requests
+from pydantic import BaseModel
+
+class AnswerFormat(BaseModel):
+    first_name: str
+    last_name: str
+    year_of_birth: int
+    num_seasons_in_nba: int
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""Be precise and concise.""},
+        {""role"": ""user"", ""content"": (
+            ""Tell me about Michael Jordan. ""
+            ""Please output a JSON object containing the following fields: ""
+            ""first_name, last_name, year_of_birth, num_seasons_in_nba. ""
+        )},
+    ],
+    ""response_format"": {
+		    ""type"": ""json_schema"",
+        ""json_schema"": {""schema"": AnswerFormat.model_json_schema()},
+    },
+}
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Response**",FAITHFUL,"The provided text correctly describes how to use the `search_domain_filter` feature by excluding specific domains from search results, accurately reflecting the information found in the source. It mentions prefixing domain names with a minus sign, which is consistent with the guidance given in the source about using the `search_domain_filter`.",non-contradictory,"The ANSWER does not contradict the REFERENCE; it accurately describes the use of the `search_domain_filter` parameter and provides additional details about excluding multiple domains, which are consistent with the instructions given in the REFERENCE."
+Which libraries are imported in the example code for sending the API request?,The libraries imported in the example code for sending the API request are `openai` and `requests`.,"In the example code for sending API requests, the following library is imported:
+
+- **`requests`**: This library is used in the Python code to send HTTP requests to the API. 
+
+No additional libraries are mentioned in the provided examples.","<Card title=""Knowledge Base"" icon=""book"" iconType=""solid"">
+    Explore tutorials, FAQs, and best practices from our team and community contributors. [Browse resources](https://github.com/ppl-ai/api-discussion/)
+  </Card>
+</CardGroup>
+
+## Community Guidelines
+
+We're committed to fostering an inclusive, helpful, and respectful community. Please follow these guidelines in all interactions:
+
+1. **Be respectful** - Treat everyone with courtesy and professionalism
+2. **Be constructive** - Provide helpful feedback and solutions
+3. **Share knowledge** - Help others learn and grow
+4. **Stay on topic** - Keep discussions relevant to the Perplexity API
+5. **No spam or self-promotion** - Share your work in appropriate channels
+
+
+# Frequently Asked Questions
+Source: https://docs.perplexity.ai/faq/faq
+
+<AccordionGroup>
+  <Accordion title=""Why isn't the `response_format` parameter working for reasoning models?"">
+    The `sonar-reasoning-pro` model is designed to output a `<think>` section containing reasoning tokens, immediately followed by a valid JSON object. As a result, the `response_format` parameter does not remove these reasoning tokens from the output.
+
+    We recommend using a custom parser to extract the valid JSON portion. An example implementation can be found [here](https://github.com/ppl-ai/api-discussion/blob/main/utils/extract_json_reasoning_models.py).
+  </Accordion>
+
+  <Accordion title=""Does the API use content filtering or SafeSearch?"">
+    Yes, for the API, content filtering in the form of SafeSearch is turned on by default. This helps filter out potentially offensive and inappropriate content, including pornography, from search results. SafeSearch is an automated filter that works across search results to provide a safer experience. You can learn more about SafeSearch on the [official Wikipedia page](https://en.wikipedia.org/wiki/SafeSearch).
+  </Accordion>
+
+  <Accordion title=""How do I file a bug report and what happens afterward?"">
+    To file a bug report, please use our GitHub repository and file the bug in [issues](https://github.com/ppl-ai/api-discussion/issues). Once you've submitted your report, we kindly ask that you share the link to the issue with us via email at [api@perplexity.ai](mailto:api@perplexity.ai) so we can track it on our end.
+
+    We truly appreciate your patience, and we'll get back to you as soon as possible. Due to the current volume of reports, it may take a little time for us to respond—but rest assured, we're on it.
+  </Accordion>
+
+  <Accordion title=""Where are Perplexity's language models hosted?"">
+    Our compute is hosted via Amazon Web Services in North America. By default, the API has zero day retention of user prompt data, which is never used for AI training.
+  </Accordion>
+
+  <Accordion title=""How can I upgrade to the next usage tier?"">
+    The only way for an account to be upgraded to the next usage tier is through all-time credit purchase.
+
+    Here are the spending criteria associated with each tier:
+Here are the spending criteria associated with each tier:
+
+    | Tier   | Credit Purchase (all time) |
+    | ------ | -------------------------- |
+    | Tier 0 | -                          |
+    | Tier 1 | \$50                       |
+    | Tier 2 | \$250                      |
+    | Tier 3 | \$500                      |
+    | Tier 4 | \$1000                     |
+    | Tier 5 | \$5000                     |
+  </Accordion>
+
+  <Accordion title=""How can I track my spend/usage per API key?"">
+    We offer a way to track your billing per API key. You can do this by navigating to the following location:
+
+    **Settings > View Dashboard > Invoice history > Invoices**
+
+    Then click on any invoice and each item from the total bill will have a code at the end of it (e.g., pro (743S)). Those 4 characters are the last 4 of your API key.
+  </Accordion>
+
+  <Accordion title=""How do I request a new feature?"">
+    A Feature Request is a suggestion to improve or add new functionality to the Perplexity Sonar API, such as:
+
+    * Requesting support for a new model or capability (e.g., image processing, fine-tuning options)
+    * Asking for new API parameters (e.g., additional filters, search options)
+    * Suggesting performance improvements (e.g., faster response times, better citation handling)
+    * Enhancing existing API features (e.g., improving streaming reliability, adding new output formats)
+
+    If your request aligns with these, please submit a feature request here: [Github Feature requests](https://github.com/ppl-ai/api-discussion/issues)
+  </Accordion>
+
+  <Accordion title=""Why are the results from the API different from the UI? "">
+    1. The API uses the same search system as the UI with differences in configuration—so their outputs may differ.
+    2. The underlying AI model might differ between the API and the UI for a given query.
+    3. We give users the power to tune the API to their respective use cases using sampling parameters like `presence_penalty`, `top_p`, etc. Custom tuning to specific use cases might lead to less generalization compared to the UI. We set optimized defaults and recommend not to explicitly provide sampling parameters in your API requests.
+  </Accordion>
+
+  <Accordion title=""Will user data submitted through the API be used for model training or other purposes?"">
+    We collect the following types of information:
+
+    **API Usage Data:** We collect billable usage metadata such as the number of requests and tokens. You can view your own usage in the [Perplexity API dashboard](https://perplexity.ai/settings/api).
+
+    **User Account Information:** When you create an account with us, we collect your name, email address, and other relevant contact information.
+
+    We do not retain any query data sent through the API and do not train on any of your data.
+  </Accordion>
+
+  <Accordion title=""Does the API currently support web browsing?"">
+    Yes, the [Sonar Models](https://docs.perplexity.ai/guides/model-cards) leverage information from Perplexity's search index and the public internet.
+  </Accordion>
+**1. Refining Results with Latitude and Longitude**
+
+This example provides specific coordinates (approximating San Francisco) to get geographically relevant search results.
+
+**Request Example**
+
+<CodeGroup>
+  ```bash cURL
+  curl --location 'https://api.perplexity.ai/chat/completions' \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar-pro"",
+      ""messages"": [
+        {""role"": ""system"", ""content"": ""You are a helpful local guide.""},
+        {""role"": ""user"", ""content"": ""What are some good coffee shops nearby?""}
+      ],
+      ""web_search_options"": {
+        ""user_location"": {
+          ""latitude"": 37.7749,
+          ""longitude"": -122.4194
+        }
+      }
+  }'
+  ```
+
+  ```python Python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+      ""model"": ""sonar-pro"",
+      ""messages"": [
+          {""role"": ""system"", ""content"": ""You are a helpful local guide.""},
+          {""role"": ""user"", ""content"": ""What are some good coffee shops nearby?""}
+      ],
+      ""web_search_options"": {
+        ""user_location"": {
+          ""latitude"": 37.7749,
+          ""longitude"": -122.4194
+        }
+      }
+  }
+
+  response = requests.post(url, headers=headers, json=payload)
+  print(response.json())
+  ```
+</CodeGroup>
+
+**2. Refining Results with Country Code**
+
+This example uses a two-letter ISO country code (United States) to provide broader geographic context.
+
+**Request Example**
+
+<CodeGroup>
+  ```bash cURL
+  curl --location 'https://api.perplexity.ai/chat/completions' \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar-pro"",
+      ""messages"": [
+        {""role"": ""system"", ""content"": ""You are an expert on international news.""},
+        {""role"": ""user"", ""content"": ""Summarize today's political news.""}
+      ],
+      ""web_search_options"": {
+        ""user_location"": {
+          ""country"": ""US""
+        }
+      }
+  }'
+  ```
+
+  ```python Python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+      ""model"": ""sonar-pro"",
+      ""messages"": [
+          {""role"": ""system"", ""content"": ""You are an expert on international news.""},
+          {""role"": ""user"", ""content"": ""Summarize today's political news.""}
+      ],
+      ""web_search_options"": {
+        ""user_location"": {
+          ""country"": ""US""
+        }
+      }
+  }
+
+  response = requests.post(url, headers=headers, json=payload)
+  print(response.json())
+  ```
+</CodeGroup>
+
+**3. Combining Coordinates and Country Code**
+
+This example provides both specific coordinates (approximating Paris) and the country code (""FR"") for maximum geographic context.
+
+**Request Example**
+**3. Combining Coordinates and Country Code**
+
+This example provides both specific coordinates (approximating Paris) and the country code (""FR"") for maximum geographic context.
+
+**Request Example**
+
+<CodeGroup>
+  ```bash cURL
+  curl --location 'https://api.perplexity.ai/chat/completions' \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar-pro"",
+      ""messages"": [
+        {""role"": ""system"", ""content"": ""You are an expert on French news and events.""},
+        {""role"": ""user"", ""content"": ""What major events are happening in the capital this week?""}
+      ],
+      ""web_search_options"": {
+        ""user_location"": {
+          ""latitude"": 48.8566, 
+          ""longitude"": 2.3522,
+          ""country"": ""FR""
+        }
+      }
+  }'
+  ```
+
+  ```python Python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+      ""model"": ""sonar-pro"",
+      ""messages"": [
+          {""role"": ""system"", ""content"": ""You are an expert on French news and events.""},
+          {""role"": ""user"", ""content"": ""What major events are happening in the capital this week?""}
+      ],
+      ""web_search_options"": {
+        ""user_location"": {
+          ""latitude"": 48.8566, 
+          ""longitude"": 2.3522,
+          ""country"": ""FR""
+        }
+      }
+  }
+
+  response = requests.post(url, headers=headers, json=payload)
+  print(response.json())
+  ```
+</CodeGroup>
+
+## Best Practices
+
+**Choosing the Right Specificity**
+•	**Latitude/Longitude:** Use for high precision when the exact location is known and relevant (e.g., finding nearby points of interest).
+•	**Country Code:** Use for broader context when country-level relevance is sufficient (e.g., national news, country-specific regulations).
+•	**Combining Fields:** Providing both coordinates and country code can offer the most context. The coordinates give precision, while the country code adds broader regional signals (like language or national context) that might influence results.
+
+**Data Accuracy**
+•	Ensure the provided location data is as accurate as possible. Incorrect data may lead to irrelevant results.
+•	Latitude values must be between -90 and 90. Longitude values must be between -180 and 180.
+•	Country codes should be valid two-letter ISO 3166-1 alpha-2 codes (e.g., ""US"", ""GB"", ""DE"").
+
+**Privacy Considerations**
+•	Be mindful of user privacy when collecting and transmitting location data. Only use location when necessary and with user consent where applicable.
+
+**Client-Side Validation**
+•	Consider validating location inputs before sending the request:
+
+* Check latitude/longitude ranges.
+* Validate country code format (two uppercase letters).
+
+⸻
+
+
+# null
+Source: https://docs.perplexity.ai/home
+
+export function openSearch() {
+  document.getElementById(""search-bar-entry"").click();
+}
+
+<div className=""w-full text-center bg-dark-olive py-16 mb-[128px]"">
+  <img src=""https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/mark-ecru.svg"" alt=""Sonar Ecru"" width=""55"" height=""55"" className=""block mx-auto mb-6"" />
+We recommend updating your applications to use our recently released Sonar or Sonar Pro models – you can learn more about them here. Thank you for being a Perplexity API user.
+  </Accordion>
+
+  <Accordion title=""Build with Perplexity's new APIs"" description=""January 2025"">
+    We are expanding API offerings with the most efficient and cost-effective search solutions available:  **Sonar** and **Sonar Pro**.
+
+    **Sonar** gives you fast, straightforward answers
+
+    **Sonar Pro** tackles complex questions that need deeper research and provides more sources
+
+    Both models offer built-in citations, automated scaling of rate limits, and public access to advanced features like structured outputs and search domain filters. And don't worry, we never train on your data. Your information stays yours.
+
+    You can learn more about our new APIs here - [http://sonar.perplexity.ai/](http://sonar.perplexity.ai/)
+  </Accordion>
+
+  <Accordion title=""Citations Public Release and Increased Default Rate Limits"" description=""November 2024"">
+    We are excited to announce the public availability of citations in the Perplexity API. In addition, we have also increased our default rate limit for the sonar online models to 50 requests/min for all users.
+
+    Effective immediately, all API users will see citations returned as part of their requests by default. This is not a breaking change. The **return\_citations** parameter will no longer have any effect.
+
+    If you have any questions or need assistance, feel free to reach out to our team at [api@perplexity.ai](mailto:api@perplexity.ai)
+  </Accordion>
+
+  <Accordion title=""Introducing New and Improved Sonar Models."" description=""July 2024"">
+    We are excited to announce the launch of our latest Perplexity Sonar models:
+
+    **Online Models** -
+    `llama-3.1-sonar-small-128k-online`
+    `llama-3.1-sonar-large-128k-online`
+
+    **Chat Models** -
+    `llama-3.1-sonar-small-128k-chat`
+    `llama-3.1-sonar-large-128k-chat`
+
+    These new additions surpass the performance of the previous iteration. For detailed information on our supported models, please visit our model card documentation.
+
+    **\[Action Required]** Model Deprecation Notice
+    Please note that several models will no longer be accessible effective 8/12/2024. We recommend updating your applications to use models in the Llama-3.1 family immediately.
+
+    The following model names will no longer be available via API -
+    `llama-3-sonar-small-32k-online`
+    `llama-3-sonar-large-32k-online`
+    `llama-3-sonar-small-32k-chat`
+    `llama-3-sonar-large-32k-chat`
+    `llama-3-8b-instruct`
+    `llama-3-70b-instruct`
+    `mistral-7b-instruct`
+    `mixtral-8x7b-instruct`
+
+    We recommend switching to models in the Llama-3.1 family:
+
+    **Online Models** -
+    `llama-3.1-sonar-small-128k-online`
+    `llama-3.1-sonar-large-128k-online`
+
+    **Chat Models** -
+    `llama-3.1-sonar-small-128k-chat`
+    `llama-3.1-sonar-large-128k-chat`
+
+    **Instruct Models** -
+    `llama-3.1-70b-instruct`
+    `llama-3.1-8b-instruct`",UNFAITHFUL,"The response states that 'No additional libraries are mentioned in the provided examples,' which contradicts the source. The source includes a 'curl' example to make requests, indicating that command-line tools or methods for sending requests other than the specified Python 'requests' library could also be utilized. Therefore, this statement adds unsupported assumptions that are not grounded in the source material.",contradictory,"The ANSWER states that no additional libraries are mentioned, while the REFERENCE indicates that both `openai` and `requests` are imported in the code, which directly contradicts the assertion in the ANSWER."
+How should domain names be specified for optimal filtering of search results?,"For optimal filtering of search results using domain names, specify simple domain names (e.g., `example.com`) without protocol prefixes or subdomains. You can include up to 10 domains in your `search_domain_filter` list, mixing inclusion and exclusion by prefixing domains to exclude with a minus sign (e.g., `-pinterest.com`). Use domains that are most relevant to your query for better results, and consider limiting the number of domains for targeted filtering.","To optimize filtering of search results using domain names, follow these best practices:
+
+1. **Use Simple Domain Names**: Specify domains in their simplest form without protocol prefixes (e.g., `http://`, `https://`) or subdomain specifiers (e.g., `www.`). For instance, use `example.com` instead of `https://www.example.com`.
+
+2. **Main Domains Only**: Utilize the main domain (e.g., `nytimes.com`) to filter all subdomains as well.
+
+3. **Be Specific**: Choose domains that are most relevant to your query to achieve better results.
+
+4. **Combine Approaches**: You can combine domain inclusion and exclusion in the same request (e.g., `[""wikipedia.org"", ""-pinterest.com""]`).
+
+5. **Limit Filter Size**: Although you can add up to 10 domains, using a smaller, more targeted selection typically yields better results.
+
+By following these guidelines, you will enhance the accuracy and relevance of the search results you receive.","**Good Example**: ""Compare the energy efficiency ratings of heat pumps vs. traditional HVAC systems for residential use""
+
+    **Poor Example**: ""Tell me which home heating is better""
+  </Card>
+
+  <Card title=""Provide Relevant Context"">
+    Include critical context to guide the web search toward the most relevant content, but keep prompts concise and focused.
+
+    **Good Example**: ""Explain the impact of the 2023 EU digital markets regulations on app store competition for small developers""
+
+    **Poor Example**: ""What are the rules for app stores?""
+  </Card>
+</CardGroup>
+
+## Web Search Model Pitfalls to Avoid
+
+<CardGroup cols={2}>
+  <Card title=""Overly Generic Questions"">
+    Generic prompts lead to scattered web search results and unfocused responses. Always narrow your scope.
+
+    **Avoid**: ""What's happening in AI?""
+
+    **Instead**: ""What are the three most significant commercial applications of generative AI in healthcare in the past year?""
+  </Card>
+
+  <Card title=""Traditional LLM Techniques"">
+    Prompting strategies designed for traditional LLMs often don't work well with web search models. Adapt your approach accordingly.
+
+    **Avoid**: ""Act as an expert chef and give me a recipe for sourdough bread. Start by explaining the history of sourdough, then list ingredients, then...""
+
+    **Instead**: ""What's a reliable sourdough bread recipe for beginners? Include ingredients and step-by-step instructions.""
+  </Card>
+
+  <Card title=""Complex Multi-Part Requests"">
+    Complex prompts with multiple unrelated questions can confuse the search component. Focus on one topic per query.
+
+    **Avoid**: ""Explain quantum computing, and also tell me about regenerative agriculture, and provide stock market predictions.""
+
+    **Instead**: ""Explain quantum computing principles that might impact cryptography in the next decade.""
+  </Card>
+
+  <Card title=""Assuming Search Intent"">
+    Don't assume the model will search for what you intended without specific direction. Be explicit about exactly what information you need.
+
+    **Avoid**: ""Tell me about the latest developments.""
+
+    **Instead**: ""What are the latest developments in offshore wind energy technology announced in the past 6 months?""
+  </Card>
+</CardGroup>
+
+### Advanced Techniques
+
+<Tip>
+  We recommend for users *not* to tune language parameters such as `temperature`, as the default settings for these have already been optimized.
+</Tip>
+
+<CardGroup cols={1}>
+  <Card title=""Parameter Optimization"">
+    Adjust model parameters based on your specific needs:
+
+    * **Search Domain Filter**: Limit results to trusted sources for research-heavy queries.
+    * **Search Context Size**: Use ""high"" for comprehensive research questions and ""low"" for simple factual queries.
+
+    Example configuration for technical documentation:
+
+    ```json
+    {
+      ""search_domain_filter"": [""wikipedia.org"", ""docs.python.org""],
+      ""web_search_options"": {
+        ""search_context_size"": ""medium""
+      }
+    }
+    ```
+  </Card>
+</CardGroup>
+
+### Tips for Different Query Types
+**Pro-tip**: Use `high` for research-heavy or nuanced queries where coverage matters more than cost.
+
+⸻
+
+
+# Search Domain Filter Guide
+Source: https://docs.perplexity.ai/guides/search-domain-filters
+
+<Note>
+  The `search_domain_filter` feature allows you to limit search results to specific domains or exclude certain domains from search results.
+</Note>
+
+<Warning>
+  You can add a maximum of 10 domains to the `search_domain_filter` list.
+</Warning>
+
+## Overview
+
+The `search_domain_filter` parameter allows you to control which websites are included in or excluded from the search results used by the Sonar models. This feature is particularly useful when you want to:
+
+* Restrict search results to trusted sources
+* Filter out specific domains from search results
+* Focus research on particular websites
+
+Enabling domain filtering can be done by adding a `search_domain_filter` field in the request:
+
+```
+""search_domain_filter"": [
+  ""<domain1>"",
+  ""<domain2>"",
+  ...
+]
+```
+
+Each entry in the list should be a simple domain name. To exclude a domain, prefix it with a minus sign (`-`).
+
+## Examples
+
+### 1. Allowlist Specific Domains
+
+This example shows how to limit search results to only include content from specific domains.
+
+**Request**
+
+```python
+import requests
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar-reasoning-pro"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""You are a helpful assistant.""},
+        {""role"": ""user"", ""content"": ""Tell me about the James Webb Space Telescope discoveries.""}
+    ],
+    ""search_domain_filter"": [
+        ""nasa.gov"",
+        ""wikipedia.org"",
+        ""space.com""
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Best Practice**: Use simple domain names (e.g., `wikipedia.org`) without additional elements like `https://` or `www.` prefixes.
+
+### 2. Denylist Specific Domains
+
+This example shows how to exclude specific domains from search results by prefixing the domain name with a minus sign (`-`).
+
+**Request**
+
+```python
+import requests
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar-deep-research"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""You are a helpful assistant.""},
+        {""role"": ""user"", ""content"": ""What are the latest advancements in renewable energy?""}
+    ],
+    ""search_domain_filter"": [
+        ""-pinterest.com"",
+        ""-reddit.com"",
+        ""-quora.com""
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Best Practice**: Use simple domain names with a minus prefix (e.g., `-pinterest.com`) to exclude domains from search results.
+
+## Best Practices
+
+### Domain Specification
+⸻
+
+## Examples
+
+### 1. Exclude Specific Image Domains
+
+This request filters out images from Getty Images.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_domain_filter"": [""-gettyimages.com""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me images of Mount Everest""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_domain_filter"": [""-gettyimages.com""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me images of Mount Everest""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+### 2. Only Return GIFs
+
+This request restricts results to GIF images.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_format_filter"": [""gif""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me a funny cat gif""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_format_filter"": [""gif""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me a funny cat gif""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+## 3. Combine Domain and Format Filters
+
+You can combine both filters for precise control.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_domain_filter"": [""-gettyimages.com""],
+      ""image_format_filter"": [""gif""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me a gif of a dog""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_domain_filter"": [""-gettyimages.com""],
+    ""image_format_filter"": [""gif""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me a gif of a dog""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+## Best Practices
+**Best Practice**: Use simple domain names with a minus prefix (e.g., `-pinterest.com`) to exclude domains from search results.
+
+## Best Practices
+
+### Domain Specification
+
+* **Use simple domain names**: Specify domains in their simplest form (e.g., `example.com`) without protocol prefixes (`http://`, `https://`) or subdomain specifiers (`www.`).
+* **Main domains only**: Using the main domain (e.g., `nytimes.com`) will filter all subdomains as well.
+
+### Filter Optimization
+
+* **Be specific**: Use domains that are most relevant to your query to get the best results.
+* **Combine approaches**: You can mix inclusion and exclusion in the same request (e.g., `[""wikipedia.org"", ""-pinterest.com""]`).
+* **Limit filter size**: Although you can add up to 10 domains, using fewer, more targeted domains often yields better results.
+
+### Performance Considerations
+
+* Adding domain filters may slightly increase response time as the search engine needs to apply additional filtering.
+* Overly restrictive domain filters might result in fewer search results, potentially affecting the quality of the response.
+
+
+# Structured Outputs Guide
+Source: https://docs.perplexity.ai/guides/structured-outputs
+
+<Info>
+  The first request with a new JSON Schema or Regex expects to incur delay on the first token. Typically, it takes 10 to 30 seconds to prepare the new schema, and may result in timeout errors. Once the schema has been prepared, the subsequent requests will not see such delay.
+</Info>
+
+## Overview
+
+We currently support two types of structured outputs: **JSON Schema** and **Regex**. LLM responses will work to match the specified format, except for the following cases:
+
+* The output exceeds `max_tokens`
+
+Enabling the structured outputs can be done by adding a `response_format` field in the request:
+
+**JSON Schema**
+
+* `response_format: { type: ""json_schema"", json_schema: {""schema"": object} }` .
+
+* The schema should be a valid JSON schema object.
+
+**Regex** (only available for `sonar` right now)
+
+* `response_format: { type: ""regex"", regex: {""regex"": str} }` .
+
+* The regex is a regular expression string.
+
+We recommend to give the LLM some hints about the output format in the prompts.
+
+## Examples
+
+### 1. Get a response in JSON format
+
+**Request**
+
+```python
+import requests
+from pydantic import BaseModel
+
+class AnswerFormat(BaseModel):
+    first_name: str
+    last_name: str
+    year_of_birth: int
+    num_seasons_in_nba: int
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""Be precise and concise.""},
+        {""role"": ""user"", ""content"": (
+            ""Tell me about Michael Jordan. ""
+            ""Please output a JSON object containing the following fields: ""
+            ""first_name, last_name, year_of_birth, num_seasons_in_nba. ""
+        )},
+    ],
+    ""response_format"": {
+		    ""type"": ""json_schema"",
+        ""json_schema"": {""schema"": AnswerFormat.model_json_schema()},
+    },
+}
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Response**
+### Tips for Different Query Types
+
+| Query Type              | Best Practices                                                                                                                         |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| **Factual Research**    | • Use specific questions  • Use search domain filters for academic sources  • Consider ""high"" search context size                      |
+| **Creative Content**    | • Provide detailed style guidelines in system prompt  • Specify tone, voice, and audience                                              |
+| **Technical Questions** | • Include relevant technical context  • Specify preferred programming language/framework  • Use domain filters for documentation sites |
+| **Analysis & Insights** | • Request step-by-step reasoning  • Ask for specific metrics or criteria                                                               |
+
+
+# Search Context Size
+Source: https://docs.perplexity.ai/guides/search-context-size-guide
+
+<Note>
+  The `search_context_size` parameter allows you to control how much search context is retrieved from the web during query resolution, letting you balance cost and comprehensiveness.
+</Note>
+
+<Warning>
+  * Default `search_context_size` is `low`
+  * Selecting `""high""` increases search costs due to more extensive web retrieval. Use `""low""` when cost efficiency is critical.
+</Warning>
+
+## Overview
+
+The `search_context_size` field—passed via the `web_search_options` object—determines how much search context is retrieved by the Sonar models. This setting can help you optimize for either:
+
+* Cost savings with minimal search input (`low`)
+* Comprehensive answers by maximizing retrieved information (`high`)
+* A balance of both (`medium`)
+
+This flexibility allows teams to tune their API usage to their budget and use case.
+
+To enable this feature, include the web\_search\_options.search\_context\_size parameter in your request payload:
+
+```bash
+""web_search_options"": {
+  ""search_context_size"": ""medium""
+}
+```
+
+## Best Practices
+
+**Choosing the Right Context Size**
+
+* `low`: Best for short factual queries or when operating under strict token cost constraints.
+* `medium`: The default and best suited for general use cases.
+* `high`: Use for deep research, exploratory questions, or when citations and evidence coverage are critical.
+
+**Cost Optimization**
+
+* Selecting `low` or `medium` can significantly reduce overall token usage, especially at scale.
+* Consider defaulting to `low` for high-volume endpoints and selectively upgrading to `high` for complex user prompts.
+
+Combining with Other Filters
+
+* You can use `search_context_size` alongside other features like `search_domain_filter` to further control the scope of search.
+* Combining `medium` with a focused domain filter often gives a good tradeoff between quality and cost.
+
+Performance Considerations",FAITHFUL,"The text accurately presents the best practices for optimizing filtering of search results using domain names, which is consistent with the information provided in the source. It does not contradict, add new information, or make unsupported assumptions.",non-contradictory,"The provided text echoes the guidelines from the reference, outlining the use of simple domain names, the inclusion of both main domains and subdomains, and the importance of relevance in choosing domains. It does not state anything that contradicts the content of the reference material."
+What happens if overly restrictive domain filters are applied to a search request?,"Overly restrictive domain filters can lead to fewer search results, which may negatively impact the quality and relevance of the response.","When overly restrictive domain filters are applied to a search request, it can result in a limited number of search results. This may negatively impact the quality and comprehensiveness of the responses, as the model might not be able to retrieve relevant information due to the narrow filtering criteria. Consequently, users may receive less useful or even incomplete answers. It's often better to use fewer, more targeted domains to ensure a balanced mix of quality and quantity in the results.","**Good Example**: ""Compare the energy efficiency ratings of heat pumps vs. traditional HVAC systems for residential use""
+
+    **Poor Example**: ""Tell me which home heating is better""
+  </Card>
+
+  <Card title=""Provide Relevant Context"">
+    Include critical context to guide the web search toward the most relevant content, but keep prompts concise and focused.
+
+    **Good Example**: ""Explain the impact of the 2023 EU digital markets regulations on app store competition for small developers""
+
+    **Poor Example**: ""What are the rules for app stores?""
+  </Card>
+</CardGroup>
+
+## Web Search Model Pitfalls to Avoid
+
+<CardGroup cols={2}>
+  <Card title=""Overly Generic Questions"">
+    Generic prompts lead to scattered web search results and unfocused responses. Always narrow your scope.
+
+    **Avoid**: ""What's happening in AI?""
+
+    **Instead**: ""What are the three most significant commercial applications of generative AI in healthcare in the past year?""
+  </Card>
+
+  <Card title=""Traditional LLM Techniques"">
+    Prompting strategies designed for traditional LLMs often don't work well with web search models. Adapt your approach accordingly.
+
+    **Avoid**: ""Act as an expert chef and give me a recipe for sourdough bread. Start by explaining the history of sourdough, then list ingredients, then...""
+
+    **Instead**: ""What's a reliable sourdough bread recipe for beginners? Include ingredients and step-by-step instructions.""
+  </Card>
+
+  <Card title=""Complex Multi-Part Requests"">
+    Complex prompts with multiple unrelated questions can confuse the search component. Focus on one topic per query.
+
+    **Avoid**: ""Explain quantum computing, and also tell me about regenerative agriculture, and provide stock market predictions.""
+
+    **Instead**: ""Explain quantum computing principles that might impact cryptography in the next decade.""
+  </Card>
+
+  <Card title=""Assuming Search Intent"">
+    Don't assume the model will search for what you intended without specific direction. Be explicit about exactly what information you need.
+
+    **Avoid**: ""Tell me about the latest developments.""
+
+    **Instead**: ""What are the latest developments in offshore wind energy technology announced in the past 6 months?""
+  </Card>
+</CardGroup>
+
+### Advanced Techniques
+
+<Tip>
+  We recommend for users *not* to tune language parameters such as `temperature`, as the default settings for these have already been optimized.
+</Tip>
+
+<CardGroup cols={1}>
+  <Card title=""Parameter Optimization"">
+    Adjust model parameters based on your specific needs:
+
+    * **Search Domain Filter**: Limit results to trusted sources for research-heavy queries.
+    * **Search Context Size**: Use ""high"" for comprehensive research questions and ""low"" for simple factual queries.
+
+    Example configuration for technical documentation:
+
+    ```json
+    {
+      ""search_domain_filter"": [""wikipedia.org"", ""docs.python.org""],
+      ""web_search_options"": {
+        ""search_context_size"": ""medium""
+      }
+    }
+    ```
+  </Card>
+</CardGroup>
+
+### Tips for Different Query Types
+**Pro-tip**: Use `high` for research-heavy or nuanced queries where coverage matters more than cost.
+
+⸻
+
+
+# Search Domain Filter Guide
+Source: https://docs.perplexity.ai/guides/search-domain-filters
+
+<Note>
+  The `search_domain_filter` feature allows you to limit search results to specific domains or exclude certain domains from search results.
+</Note>
+
+<Warning>
+  You can add a maximum of 10 domains to the `search_domain_filter` list.
+</Warning>
+
+## Overview
+
+The `search_domain_filter` parameter allows you to control which websites are included in or excluded from the search results used by the Sonar models. This feature is particularly useful when you want to:
+
+* Restrict search results to trusted sources
+* Filter out specific domains from search results
+* Focus research on particular websites
+
+Enabling domain filtering can be done by adding a `search_domain_filter` field in the request:
+
+```
+""search_domain_filter"": [
+  ""<domain1>"",
+  ""<domain2>"",
+  ...
+]
+```
+
+Each entry in the list should be a simple domain name. To exclude a domain, prefix it with a minus sign (`-`).
+
+## Examples
+
+### 1. Allowlist Specific Domains
+
+This example shows how to limit search results to only include content from specific domains.
+
+**Request**
+
+```python
+import requests
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar-reasoning-pro"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""You are a helpful assistant.""},
+        {""role"": ""user"", ""content"": ""Tell me about the James Webb Space Telescope discoveries.""}
+    ],
+    ""search_domain_filter"": [
+        ""nasa.gov"",
+        ""wikipedia.org"",
+        ""space.com""
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Best Practice**: Use simple domain names (e.g., `wikipedia.org`) without additional elements like `https://` or `www.` prefixes.
+
+### 2. Denylist Specific Domains
+
+This example shows how to exclude specific domains from search results by prefixing the domain name with a minus sign (`-`).
+
+**Request**
+
+```python
+import requests
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar-deep-research"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""You are a helpful assistant.""},
+        {""role"": ""user"", ""content"": ""What are the latest advancements in renewable energy?""}
+    ],
+    ""search_domain_filter"": [
+        ""-pinterest.com"",
+        ""-reddit.com"",
+        ""-quora.com""
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Best Practice**: Use simple domain names with a minus prefix (e.g., `-pinterest.com`) to exclude domains from search results.
+
+## Best Practices
+
+### Domain Specification
+⸻
+
+## Examples
+
+### 1. Exclude Specific Image Domains
+
+This request filters out images from Getty Images.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_domain_filter"": [""-gettyimages.com""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me images of Mount Everest""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_domain_filter"": [""-gettyimages.com""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me images of Mount Everest""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+### 2. Only Return GIFs
+
+This request restricts results to GIF images.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_format_filter"": [""gif""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me a funny cat gif""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_format_filter"": [""gif""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me a funny cat gif""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+## 3. Combine Domain and Format Filters
+
+You can combine both filters for precise control.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_domain_filter"": [""-gettyimages.com""],
+      ""image_format_filter"": [""gif""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me a gif of a dog""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_domain_filter"": [""-gettyimages.com""],
+    ""image_format_filter"": [""gif""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me a gif of a dog""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+## Best Practices
+This update makes it easier to:
+
+    * Verify the sources used in generating responses
+    * Create custom citation formats for your applications
+    * Filter or prioritize certain sources based on your needs
+
+    **Important: The `citations` field is being deprecated in favor of the new `search_results` field.** Please update your applications to use the `search_results` field, as the `citations` field will be removed in a future update.
+
+    The `search_results` field is now available across all our search-enabled models.
+  </Accordion>
+
+  <Accordion title=""New API Portal for Organization Management"" description=""April 2025"">
+    We are excited to announce the release of our new API portal, designed to help you better manage your organization and API usage.
+
+    With this portal, you can:
+
+    * Organize and manage your API keys more effectively.
+    * Gain insights into your API usage and team activity.
+    * Streamline collaboration within your organization.
+
+    Check it out here:\
+    [https://www.perplexity.ai/account/api/group](https://www.perplexity.ai/account/api/group)
+  </Accordion>
+
+  <Accordion title=""New: Location filtering in search"" description=""April 2025"">
+    Looking to narrow down your search results based on users' locations?\
+    We now support user location filtering, allowing you to retrieve results only from a particular user location.
+
+    Check out the [guide](https://docs.perplexity.ai/guides/user-location-filter-guide).
+  </Accordion>
+
+  <Accordion title=""Image uploads now available for all users!"" description=""April 2025"">
+    You can now upload images to Sonar and use them as part of your multimodal search experience.\
+    Give it a try by following our image upload guide:\
+    [https://docs.perplexity.ai/guides/image-guide](https://docs.perplexity.ai/guides/image-guide)
+  </Accordion>
+
+  <Accordion title=""New: Date range filtering in search"" description=""April 2025"">
+    Looking to narrow down your search results to specific dates?\
+    We now support date range filtering, allowing you to retrieve results only from a particular timeframe.
+
+    Check out the guide:\
+    [https://docs.perplexity.ai/guides/date-range-filter-guide](https://docs.perplexity.ai/guides/date-range-filter-guide)
+  </Accordion>
+
+  <Accordion title=""Clarified: Search context pricing update"" description=""April 2025"">
+    We've fully transitioned to our new pricing model: citation tokens are no longer charged.\
+    If you were already using the `search_context_size` parameter, you've been on this model already.
+
+    This change makes pricing simpler and cheaper for everyone — with no downside.
+
+    View the updated pricing:\
+    [https://docs.perplexity.ai/guides/pricing](https://docs.perplexity.ai/guides/pricing)
+  </Accordion>
+
+  <Accordion title=""All features now available to everyone"" description=""April 2025"">
+    We've removed all feature gating based on tiered spending. These were previously only available to users of Tier 3 and above.
+**Best Practice**: Use simple domain names with a minus prefix (e.g., `-pinterest.com`) to exclude domains from search results.
+
+## Best Practices
+
+### Domain Specification
+
+* **Use simple domain names**: Specify domains in their simplest form (e.g., `example.com`) without protocol prefixes (`http://`, `https://`) or subdomain specifiers (`www.`).
+* **Main domains only**: Using the main domain (e.g., `nytimes.com`) will filter all subdomains as well.
+
+### Filter Optimization
+
+* **Be specific**: Use domains that are most relevant to your query to get the best results.
+* **Combine approaches**: You can mix inclusion and exclusion in the same request (e.g., `[""wikipedia.org"", ""-pinterest.com""]`).
+* **Limit filter size**: Although you can add up to 10 domains, using fewer, more targeted domains often yields better results.
+
+### Performance Considerations
+
+* Adding domain filters may slightly increase response time as the search engine needs to apply additional filtering.
+* Overly restrictive domain filters might result in fewer search results, potentially affecting the quality of the response.
+
+
+# Structured Outputs Guide
+Source: https://docs.perplexity.ai/guides/structured-outputs
+
+<Info>
+  The first request with a new JSON Schema or Regex expects to incur delay on the first token. Typically, it takes 10 to 30 seconds to prepare the new schema, and may result in timeout errors. Once the schema has been prepared, the subsequent requests will not see such delay.
+</Info>
+
+## Overview
+
+We currently support two types of structured outputs: **JSON Schema** and **Regex**. LLM responses will work to match the specified format, except for the following cases:
+
+* The output exceeds `max_tokens`
+
+Enabling the structured outputs can be done by adding a `response_format` field in the request:
+
+**JSON Schema**
+
+* `response_format: { type: ""json_schema"", json_schema: {""schema"": object} }` .
+
+* The schema should be a valid JSON schema object.
+
+**Regex** (only available for `sonar` right now)
+
+* `response_format: { type: ""regex"", regex: {""regex"": str} }` .
+
+* The regex is a regular expression string.
+
+We recommend to give the LLM some hints about the output format in the prompts.
+
+## Examples
+
+### 1. Get a response in JSON format
+
+**Request**
+
+```python
+import requests
+from pydantic import BaseModel
+
+class AnswerFormat(BaseModel):
+    first_name: str
+    last_name: str
+    year_of_birth: int
+    num_seasons_in_nba: int
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""Be precise and concise.""},
+        {""role"": ""user"", ""content"": (
+            ""Tell me about Michael Jordan. ""
+            ""Please output a JSON object containing the following fields: ""
+            ""first_name, last_name, year_of_birth, num_seasons_in_nba. ""
+        )},
+    ],
+    ""response_format"": {
+		    ""type"": ""json_schema"",
+        ""json_schema"": {""schema"": AnswerFormat.model_json_schema()},
+    },
+}
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Response**",FAITHFUL,"The text accurately describes the impact of applying overly restrictive domain filters on search results and aligns with the information provided in the source, which states that such filters may lead to fewer search results and negatively affect the quality of responses. Therefore, it is a faithful representation of the source material.",non-contradictory,"The ANSWER discusses the effects of overly restrictive domain filters on search results, indicating that they can lead to a limited number of results and negatively impact quality, similar to the REFERENCE. The mention of 'comprehensiveness' and 'more targeted domains' does not contradict the REFERENCE but rather expands on the original idea, emphasizing the balance between quality and quantity without conflicting with the presented facts."
+Can both inclusion and exclusion of domains be combined in the same API request?,"Yes, both inclusion and exclusion of domains can be combined in the same API request, such as using `[""wikipedia.org"", ""-pinterest.com""]`.","Yes, both inclusion and exclusion of domains can be combined in the same API request using the `search_domain_filter` parameter. You can specify specific domains to include and also use a minus sign (`-`) to exclude certain domains from the search results. This allows for precise control over which sources are used in the query.","⸻
+
+## Examples
+
+### 1. Exclude Specific Image Domains
+
+This request filters out images from Getty Images.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_domain_filter"": [""-gettyimages.com""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me images of Mount Everest""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_domain_filter"": [""-gettyimages.com""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me images of Mount Everest""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+### 2. Only Return GIFs
+
+This request restricts results to GIF images.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_format_filter"": [""gif""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me a funny cat gif""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_format_filter"": [""gif""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me a funny cat gif""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+## 3. Combine Domain and Format Filters
+
+You can combine both filters for precise control.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_domain_filter"": [""-gettyimages.com""],
+      ""image_format_filter"": [""gif""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me a gif of a dog""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_domain_filter"": [""-gettyimages.com""],
+    ""image_format_filter"": [""gif""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me a gif of a dog""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+## Best Practices
+**Pro-tip**: Use `high` for research-heavy or nuanced queries where coverage matters more than cost.
+
+⸻
+
+
+# Search Domain Filter Guide
+Source: https://docs.perplexity.ai/guides/search-domain-filters
+
+<Note>
+  The `search_domain_filter` feature allows you to limit search results to specific domains or exclude certain domains from search results.
+</Note>
+
+<Warning>
+  You can add a maximum of 10 domains to the `search_domain_filter` list.
+</Warning>
+
+## Overview
+
+The `search_domain_filter` parameter allows you to control which websites are included in or excluded from the search results used by the Sonar models. This feature is particularly useful when you want to:
+
+* Restrict search results to trusted sources
+* Filter out specific domains from search results
+* Focus research on particular websites
+
+Enabling domain filtering can be done by adding a `search_domain_filter` field in the request:
+
+```
+""search_domain_filter"": [
+  ""<domain1>"",
+  ""<domain2>"",
+  ...
+]
+```
+
+Each entry in the list should be a simple domain name. To exclude a domain, prefix it with a minus sign (`-`).
+
+## Examples
+
+### 1. Allowlist Specific Domains
+
+This example shows how to limit search results to only include content from specific domains.
+
+**Request**
+
+```python
+import requests
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar-reasoning-pro"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""You are a helpful assistant.""},
+        {""role"": ""user"", ""content"": ""Tell me about the James Webb Space Telescope discoveries.""}
+    ],
+    ""search_domain_filter"": [
+        ""nasa.gov"",
+        ""wikipedia.org"",
+        ""space.com""
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Best Practice**: Use simple domain names (e.g., `wikipedia.org`) without additional elements like `https://` or `www.` prefixes.
+
+### 2. Denylist Specific Domains
+
+This example shows how to exclude specific domains from search results by prefixing the domain name with a minus sign (`-`).
+
+**Request**
+
+```python
+import requests
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar-deep-research"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""You are a helpful assistant.""},
+        {""role"": ""user"", ""content"": ""What are the latest advancements in renewable energy?""}
+    ],
+    ""search_domain_filter"": [
+        ""-pinterest.com"",
+        ""-reddit.com"",
+        ""-quora.com""
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Best Practice**: Use simple domain names with a minus prefix (e.g., `-pinterest.com`) to exclude domains from search results.
+
+## Best Practices
+
+### Domain Specification
+<Accordion title=""What are the limitations to the number of API calls?"">
+    You can find our [rate limits here](https://docs.perplexity.ai/guides/usage-tiers).
+  </Accordion>
+
+  <Accordion title=""What's the best way to stay up to date with API updates?"">
+    We email users about new developments and also post in the [changelog](/changelog.mdx).
+  </Accordion>
+
+  <Accordion title=""How should I respond to 401: Authorization errors?"">
+    401 error codes indicate that the provided API key is invalid, deleted, or belongs to an account which ran out of credits. You likely need to purchase more credits in the [Perplexity API dashboard](https://perplexity.ai/settings/api). You can avoid this issue by configuring auto-top-up.
+  </Accordion>
+
+  <Accordion title=""Do you support fine-tuning?"">
+    Currently, we do not support fine-tuning.
+  </Accordion>
+
+  <Accordion title=""I have another question or an issue"">
+    Please reach out to [api@perplexity.ai](mailto:api@perplexity.ai) or [support@perplexity.ai](mailto:support@perplexity.ai) for other API inquiries. You can also post on our [discussion forum](https://github.com/ppl-ai/api-discussion/discussions) and we will get back to you.
+  </Accordion>
+
+  <Accordion title=""Does Perplexity provide service quality assurances such as service uptime, frequency of failures, and target recovery time in the event of a failure?"">
+    We do not guarantee this at the moment.
+  </Accordion>
+
+  <Accordion title=""Where are your DeepSeek reasoning models behind Sonar Reasoning and Sonar Reasoning Pro hosted? Is my data going to China?"">
+    The models are hosted in the US and we do not train on any of your data. And no, your data is not going to China.
+  </Accordion>
+
+  <Accordion title=""Are your reasoning APIs that use DeepSeek uncensored?"">
+    Yes, our reasoning APIs that use DeepSeek's models are uncensored and on par with the other APIs in terms of content moderation.
+  </Accordion>
+
+  <Accordion title=""Do you expose CoTs if I use your reasoning APIs or Deep Research API?"">
+    We expose the CoTs for Sonar Reasoning Pro and Sonar Reasoning. We don't currently expose the CoTs for Deep Research.
+  </Accordion>
+
+  <Accordion title=""Does R1-1776 search the web?"">
+    R1-1776 is an offline chat model that does not search the web. So this model might not have the most up-to-date information beyond its training cutoff date—which should be the same as R1.
+  </Accordion>
+
+  <Accordion title=""Are the reasoning tokens in Deep Research same as CoTs in the answer?"">
+    Reasoning tokens in Deep Research are a bit different than the CoTs in the answer—these tokens are used to reason through the research material before generating the final output via the CoTs.
+  </Accordion>
+
+  <Accordion title=""Is the internet data access provided by the API identical to that of Perplexity's web interface?"">
+    Yes, the API offers exactly the same internet data access as Perplexity's web platform.
+  </Accordion>
+3. The invited user will receive an email with a link to join your group.
+
+### Filtering Members by Role
+
+Use the dropdown to filter your list of team members by role.
+
+![Filter Members by Role](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/filter_members_by_role.png)
+
+### Roles
+
+* **Admin**: Full access to invite/remove members, manage billing, and view usage data.
+* **Member**: Can view usage and account limits but cannot modify settings.
+
+<Warning>
+  Only Admins can make changes to billing and member permissions.
+</Warning>
+
+***
+
+## Billing and Payment Methods
+
+Admins can manage billing under the **API Billing** tab. This includes:
+
+* Adding or updating credit card information
+* Enabling or disabling auto-reload
+* Viewing invoice history and usage tier
+
+![API Billing](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/api_billing.png)
+
+* Register your credit card to get started
+
+<Note>
+  This step will not charge your credit card. It just stores payment information for later API usage.
+</Note>
+
+***
+
+## Viewing Usage Metrics
+
+All members can view API usage by selecting **Usage Metrics** from the sidebar.
+
+Features include:
+
+* Total API call trends over time
+* Breakdown by API model and key
+* Optional date range filters
+
+<Check>
+  Usage metrics help you monitor API activity and optimize for cost or performance.
+</Check>
+
+***
+
+## Viewing Rate Limits and Tiers
+
+You can view your API rate limits and organization tier under the **Usage Tier** section in the billing view.
+
+Details shown:
+
+* Current rate limits per API
+* Tier level
+
+***
+
+## Managing API Keys
+
+<Info>
+  The API key is a long-lived access token that can be used until it is manually refreshed or deleted.
+</Info>
+
+* Every API call needs a valid API key. You must send the API key as a bearer token in the Authorization header with each API request.
+
+Admins can generate and revoke API keys from the **API Keys** tab.
+
+### To create a key:
+
+* Click **+ Create Key** to generate a new API key.
+
+![Generate API Keys](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/generate_api_keys.png)
+
+<Warning>
+  API keys are sensitive credentials. Never expose them in client-side code or share them in public repositories.
+</Warning>
+
+<Warning>
+  If you run out of credits, your API keys will be blocked until you add to your credit balance. You can avoid this by configuring ""Automatic Top Up"", which refreshes your balance whenever you drop below \$2.
+</Warning>
+
+![Auto Reload](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/auto_reload.png)
+
+
+# Perplexity Crawlers
+Source: https://docs.perplexity.ai/guides/bots
+
+We strive to improve our service every day by delivering the best search experience possible. To achieve this, we collect data using web crawlers (“robots”) and user agents that gather and index information from the internet, operating either automatically or in response to user requests. Webmasters can use the following robots.txt tags to manage how their sites and content interact with Perplexity. Each setting works independently, and it may take up to 24 hours for our systems to reflect changes.
+## Making Your First API Call
+
+* Once you have your API key, you can make your first API call.
+* Send the API key as a bearer token in the Authorization header with each request.
+
+### Example API Call
+
+<CodeGroup>
+  ```cURL cURL
+  curl --location 'https://api.perplexity.ai/chat/completions' \
+  --header 'accept: application/json' \
+  --header 'content-type: application/json' \
+  --header 'Authorization: Bearer {API_KEY}' \
+  --data '{
+    ""model"": ""sonar-pro"",
+    ""messages"": [
+      {
+        ""role"": ""system"",
+        ""content"": ""Be precise and concise.""
+      },
+      {
+        ""role"": ""user"",
+        ""content"": ""How many stars are there in our galaxy?""
+      }
+    ]
+  }'
+  ```
+
+  ```python python
+  from openai import OpenAI
+
+  YOUR_API_KEY = ""INSERT API KEY HERE""
+
+  messages = [
+      {
+          ""role"": ""system"",
+          ""content"": (
+              ""You are an artificial intelligence assistant and you need to ""
+              ""engage in a helpful, detailed, polite conversation with a user.""
+          ),
+      },
+      {   
+          ""role"": ""user"",
+          ""content"": (
+              ""How many stars are in the universe?""
+          ),
+      },
+  ]
+
+  client = OpenAI(api_key=YOUR_API_KEY, base_url=""https://api.perplexity.ai"")
+
+  # chat completion without streaming
+  response = client.chat.completions.create(
+      model=""sonar-pro"",
+      messages=messages,
+  )
+  print(response)
+
+  # chat completion with streaming
+  response_stream = client.chat.completions.create(
+      model=""sonar-pro"",
+      messages=messages,
+      stream=True,
+  )
+  for response in response_stream:
+      print(response)
+  ```
+</CodeGroup>
+
+<Note>
+  If you run out of credits, your API keys will be blocked until you add to your credit balance. You can avoid this by configuring ""Automatic Top Up,"" which refreshes your balance whenever it drops below a certain threshold.
+</Note>
+
+![Auto Reload](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/auto_reload.png)
+
+
+# Image Filters Guide
+Source: https://docs.perplexity.ai/guides/image-filter-guide
+
+Control image results with domain and format filters using the Perplexity API.
+
+<Note>
+  The `image_domain_filter` and `image_format_filter` parameters allow you to control the sources and file types of image results returned by the Sonar models.
+</Note>
+
+<Warning>
+  You can include a maximum of 10 entries in each of the filter lists. These filters currently apply only when `""return_images"": true` is set in your request.
+</Warning>
+
+## Overview
+
+The `image_domain_filter` and `image_format_filter` parameters give you fine-grained control over image results returned by the Sonar models. Use these filters to:
+
+* Exclude specific image providers (e.g., Getty Images)
+* Restrict to a specific file format (e.g., `.gif`)
+
+To use these filters, your request must include `""return_images"": true`.
+
+```json
+{
+  ""image_domain_filter"": [""-gettyimages.com""],
+  ""image_format_filter"": [""gif""]
+}
+
+	•	Prefix domains with - to exclude them
+	•	Use lowercase file extensions like gif, jpg, or png
+```
+
+⸻
+
+## Examples
+
+### 1. Exclude Specific Image Domains
+
+This request filters out images from Getty Images.",UNFAITHFUL,"The response incorrectly states that the `search_domain_filter` parameter allows for both inclusion and exclusion of domains in the same API request, whereas the source specifically details the `image_domain_filter` and `search_domain_filter` as separate features and does not mention combining them in a single parameter.",non-contradictory,"The ANSWER explains that both inclusion and exclusion of domains can be combined in the same API request using the `search_domain_filter` parameter, which aligns with the REFERENCE's statement about combining inclusion and exclusion. Although the wording and specifics differ slightly, the core factual content remains consistent."
+How many domains can be added to the search domain filter according to the best practices?,You can add a maximum of 10 domains to the search domain filter.,"According to the best practices, you can add a maximum of 10 domains to the `search_domain_filter` list.","**Pro-tip**: Use `high` for research-heavy or nuanced queries where coverage matters more than cost.
+
+⸻
+
+
+# Search Domain Filter Guide
+Source: https://docs.perplexity.ai/guides/search-domain-filters
+
+<Note>
+  The `search_domain_filter` feature allows you to limit search results to specific domains or exclude certain domains from search results.
+</Note>
+
+<Warning>
+  You can add a maximum of 10 domains to the `search_domain_filter` list.
+</Warning>
+
+## Overview
+
+The `search_domain_filter` parameter allows you to control which websites are included in or excluded from the search results used by the Sonar models. This feature is particularly useful when you want to:
+
+* Restrict search results to trusted sources
+* Filter out specific domains from search results
+* Focus research on particular websites
+
+Enabling domain filtering can be done by adding a `search_domain_filter` field in the request:
+
+```
+""search_domain_filter"": [
+  ""<domain1>"",
+  ""<domain2>"",
+  ...
+]
+```
+
+Each entry in the list should be a simple domain name. To exclude a domain, prefix it with a minus sign (`-`).
+
+## Examples
+
+### 1. Allowlist Specific Domains
+
+This example shows how to limit search results to only include content from specific domains.
+
+**Request**
+
+```python
+import requests
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar-reasoning-pro"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""You are a helpful assistant.""},
+        {""role"": ""user"", ""content"": ""Tell me about the James Webb Space Telescope discoveries.""}
+    ],
+    ""search_domain_filter"": [
+        ""nasa.gov"",
+        ""wikipedia.org"",
+        ""space.com""
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Best Practice**: Use simple domain names (e.g., `wikipedia.org`) without additional elements like `https://` or `www.` prefixes.
+
+### 2. Denylist Specific Domains
+
+This example shows how to exclude specific domains from search results by prefixing the domain name with a minus sign (`-`).
+
+**Request**
+
+```python
+import requests
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar-deep-research"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""You are a helpful assistant.""},
+        {""role"": ""user"", ""content"": ""What are the latest advancements in renewable energy?""}
+    ],
+    ""search_domain_filter"": [
+        ""-pinterest.com"",
+        ""-reddit.com"",
+        ""-quora.com""
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Best Practice**: Use simple domain names with a minus prefix (e.g., `-pinterest.com`) to exclude domains from search results.
+
+## Best Practices
+
+### Domain Specification
+⸻
+
+## Examples
+
+### 1. Exclude Specific Image Domains
+
+This request filters out images from Getty Images.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_domain_filter"": [""-gettyimages.com""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me images of Mount Everest""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_domain_filter"": [""-gettyimages.com""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me images of Mount Everest""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+### 2. Only Return GIFs
+
+This request restricts results to GIF images.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_format_filter"": [""gif""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me a funny cat gif""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_format_filter"": [""gif""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me a funny cat gif""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+## 3. Combine Domain and Format Filters
+
+You can combine both filters for precise control.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_domain_filter"": [""-gettyimages.com""],
+      ""image_format_filter"": [""gif""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me a gif of a dog""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_domain_filter"": [""-gettyimages.com""],
+    ""image_format_filter"": [""gif""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me a gif of a dog""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+## Best Practices
+**Good Example**: ""Compare the energy efficiency ratings of heat pumps vs. traditional HVAC systems for residential use""
+
+    **Poor Example**: ""Tell me which home heating is better""
+  </Card>
+
+  <Card title=""Provide Relevant Context"">
+    Include critical context to guide the web search toward the most relevant content, but keep prompts concise and focused.
+
+    **Good Example**: ""Explain the impact of the 2023 EU digital markets regulations on app store competition for small developers""
+
+    **Poor Example**: ""What are the rules for app stores?""
+  </Card>
+</CardGroup>
+
+## Web Search Model Pitfalls to Avoid
+
+<CardGroup cols={2}>
+  <Card title=""Overly Generic Questions"">
+    Generic prompts lead to scattered web search results and unfocused responses. Always narrow your scope.
+
+    **Avoid**: ""What's happening in AI?""
+
+    **Instead**: ""What are the three most significant commercial applications of generative AI in healthcare in the past year?""
+  </Card>
+
+  <Card title=""Traditional LLM Techniques"">
+    Prompting strategies designed for traditional LLMs often don't work well with web search models. Adapt your approach accordingly.
+
+    **Avoid**: ""Act as an expert chef and give me a recipe for sourdough bread. Start by explaining the history of sourdough, then list ingredients, then...""
+
+    **Instead**: ""What's a reliable sourdough bread recipe for beginners? Include ingredients and step-by-step instructions.""
+  </Card>
+
+  <Card title=""Complex Multi-Part Requests"">
+    Complex prompts with multiple unrelated questions can confuse the search component. Focus on one topic per query.
+
+    **Avoid**: ""Explain quantum computing, and also tell me about regenerative agriculture, and provide stock market predictions.""
+
+    **Instead**: ""Explain quantum computing principles that might impact cryptography in the next decade.""
+  </Card>
+
+  <Card title=""Assuming Search Intent"">
+    Don't assume the model will search for what you intended without specific direction. Be explicit about exactly what information you need.
+
+    **Avoid**: ""Tell me about the latest developments.""
+
+    **Instead**: ""What are the latest developments in offshore wind energy technology announced in the past 6 months?""
+  </Card>
+</CardGroup>
+
+### Advanced Techniques
+
+<Tip>
+  We recommend for users *not* to tune language parameters such as `temperature`, as the default settings for these have already been optimized.
+</Tip>
+
+<CardGroup cols={1}>
+  <Card title=""Parameter Optimization"">
+    Adjust model parameters based on your specific needs:
+
+    * **Search Domain Filter**: Limit results to trusted sources for research-heavy queries.
+    * **Search Context Size**: Use ""high"" for comprehensive research questions and ""low"" for simple factual queries.
+
+    Example configuration for technical documentation:
+
+    ```json
+    {
+      ""search_domain_filter"": [""wikipedia.org"", ""docs.python.org""],
+      ""web_search_options"": {
+        ""search_context_size"": ""medium""
+      }
+    }
+    ```
+  </Card>
+</CardGroup>
+
+### Tips for Different Query Types
+### Tips for Different Query Types
+
+| Query Type              | Best Practices                                                                                                                         |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| **Factual Research**    | • Use specific questions  • Use search domain filters for academic sources  • Consider ""high"" search context size                      |
+| **Creative Content**    | • Provide detailed style guidelines in system prompt  • Specify tone, voice, and audience                                              |
+| **Technical Questions** | • Include relevant technical context  • Specify preferred programming language/framework  • Use domain filters for documentation sites |
+| **Analysis & Insights** | • Request step-by-step reasoning  • Ask for specific metrics or criteria                                                               |
+
+
+# Search Context Size
+Source: https://docs.perplexity.ai/guides/search-context-size-guide
+
+<Note>
+  The `search_context_size` parameter allows you to control how much search context is retrieved from the web during query resolution, letting you balance cost and comprehensiveness.
+</Note>
+
+<Warning>
+  * Default `search_context_size` is `low`
+  * Selecting `""high""` increases search costs due to more extensive web retrieval. Use `""low""` when cost efficiency is critical.
+</Warning>
+
+## Overview
+
+The `search_context_size` field—passed via the `web_search_options` object—determines how much search context is retrieved by the Sonar models. This setting can help you optimize for either:
+
+* Cost savings with minimal search input (`low`)
+* Comprehensive answers by maximizing retrieved information (`high`)
+* A balance of both (`medium`)
+
+This flexibility allows teams to tune their API usage to their budget and use case.
+
+To enable this feature, include the web\_search\_options.search\_context\_size parameter in your request payload:
+
+```bash
+""web_search_options"": {
+  ""search_context_size"": ""medium""
+}
+```
+
+## Best Practices
+
+**Choosing the Right Context Size**
+
+* `low`: Best for short factual queries or when operating under strict token cost constraints.
+* `medium`: The default and best suited for general use cases.
+* `high`: Use for deep research, exploratory questions, or when citations and evidence coverage are critical.
+
+**Cost Optimization**
+
+* Selecting `low` or `medium` can significantly reduce overall token usage, especially at scale.
+* Consider defaulting to `low` for high-volume endpoints and selectively upgrading to `high` for complex user prompts.
+
+Combining with Other Filters
+
+* You can use `search_context_size` alongside other features like `search_domain_filter` to further control the scope of search.
+* Combining `medium` with a focused domain filter often gives a good tradeoff between quality and cost.
+
+Performance Considerations
+**Best Practice**: Use simple domain names with a minus prefix (e.g., `-pinterest.com`) to exclude domains from search results.
+
+## Best Practices
+
+### Domain Specification
+
+* **Use simple domain names**: Specify domains in their simplest form (e.g., `example.com`) without protocol prefixes (`http://`, `https://`) or subdomain specifiers (`www.`).
+* **Main domains only**: Using the main domain (e.g., `nytimes.com`) will filter all subdomains as well.
+
+### Filter Optimization
+
+* **Be specific**: Use domains that are most relevant to your query to get the best results.
+* **Combine approaches**: You can mix inclusion and exclusion in the same request (e.g., `[""wikipedia.org"", ""-pinterest.com""]`).
+* **Limit filter size**: Although you can add up to 10 domains, using fewer, more targeted domains often yields better results.
+
+### Performance Considerations
+
+* Adding domain filters may slightly increase response time as the search engine needs to apply additional filtering.
+* Overly restrictive domain filters might result in fewer search results, potentially affecting the quality of the response.
+
+
+# Structured Outputs Guide
+Source: https://docs.perplexity.ai/guides/structured-outputs
+
+<Info>
+  The first request with a new JSON Schema or Regex expects to incur delay on the first token. Typically, it takes 10 to 30 seconds to prepare the new schema, and may result in timeout errors. Once the schema has been prepared, the subsequent requests will not see such delay.
+</Info>
+
+## Overview
+
+We currently support two types of structured outputs: **JSON Schema** and **Regex**. LLM responses will work to match the specified format, except for the following cases:
+
+* The output exceeds `max_tokens`
+
+Enabling the structured outputs can be done by adding a `response_format` field in the request:
+
+**JSON Schema**
+
+* `response_format: { type: ""json_schema"", json_schema: {""schema"": object} }` .
+
+* The schema should be a valid JSON schema object.
+
+**Regex** (only available for `sonar` right now)
+
+* `response_format: { type: ""regex"", regex: {""regex"": str} }` .
+
+* The regex is a regular expression string.
+
+We recommend to give the LLM some hints about the output format in the prompts.
+
+## Examples
+
+### 1. Get a response in JSON format
+
+**Request**
+
+```python
+import requests
+from pydantic import BaseModel
+
+class AnswerFormat(BaseModel):
+    first_name: str
+    last_name: str
+    year_of_birth: int
+    num_seasons_in_nba: int
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""Be precise and concise.""},
+        {""role"": ""user"", ""content"": (
+            ""Tell me about Michael Jordan. ""
+            ""Please output a JSON object containing the following fields: ""
+            ""first_name, last_name, year_of_birth, num_seasons_in_nba. ""
+        )},
+    ],
+    ""response_format"": {
+		    ""type"": ""json_schema"",
+        ""json_schema"": {""schema"": AnswerFormat.model_json_schema()},
+    },
+}
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Response**",FAITHFUL,"The text accurately reflects the information from the source, which states that you can add a maximum of 10 domains to the `search_domain_filter` list.",non-contradictory,"The statement in the ANSWER aligns with the REFERENCE by stating that a maximum of 10 domains can be added to the search domain filter, albeit with slightly different wording. There is no factual contradiction."
+What increase in response time might occur due to filtering addition on domain requests?,"The increase in response time due to filtering addition on domain requests can be slight, as enabling domain filtering may involve more extensive search and reranking, particularly if a larger context size is used.",Adding domain filters may slightly increase the response time as the search engine needs to apply additional filtering.,"⸻
+
+## Examples
+
+### 1. Exclude Specific Image Domains
+
+This request filters out images from Getty Images.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_domain_filter"": [""-gettyimages.com""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me images of Mount Everest""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_domain_filter"": [""-gettyimages.com""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me images of Mount Everest""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+### 2. Only Return GIFs
+
+This request restricts results to GIF images.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_format_filter"": [""gif""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me a funny cat gif""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_format_filter"": [""gif""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me a funny cat gif""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+## 3. Combine Domain and Format Filters
+
+You can combine both filters for precise control.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_domain_filter"": [""-gettyimages.com""],
+      ""image_format_filter"": [""gif""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me a gif of a dog""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_domain_filter"": [""-gettyimages.com""],
+    ""image_format_filter"": [""gif""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me a gif of a dog""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+## Best Practices
+**Best Practice**: Use simple domain names with a minus prefix (e.g., `-pinterest.com`) to exclude domains from search results.
+
+## Best Practices
+
+### Domain Specification
+
+* **Use simple domain names**: Specify domains in their simplest form (e.g., `example.com`) without protocol prefixes (`http://`, `https://`) or subdomain specifiers (`www.`).
+* **Main domains only**: Using the main domain (e.g., `nytimes.com`) will filter all subdomains as well.
+
+### Filter Optimization
+
+* **Be specific**: Use domains that are most relevant to your query to get the best results.
+* **Combine approaches**: You can mix inclusion and exclusion in the same request (e.g., `[""wikipedia.org"", ""-pinterest.com""]`).
+* **Limit filter size**: Although you can add up to 10 domains, using fewer, more targeted domains often yields better results.
+
+### Performance Considerations
+
+* Adding domain filters may slightly increase response time as the search engine needs to apply additional filtering.
+* Overly restrictive domain filters might result in fewer search results, potentially affecting the quality of the response.
+
+
+# Structured Outputs Guide
+Source: https://docs.perplexity.ai/guides/structured-outputs
+
+<Info>
+  The first request with a new JSON Schema or Regex expects to incur delay on the first token. Typically, it takes 10 to 30 seconds to prepare the new schema, and may result in timeout errors. Once the schema has been prepared, the subsequent requests will not see such delay.
+</Info>
+
+## Overview
+
+We currently support two types of structured outputs: **JSON Schema** and **Regex**. LLM responses will work to match the specified format, except for the following cases:
+
+* The output exceeds `max_tokens`
+
+Enabling the structured outputs can be done by adding a `response_format` field in the request:
+
+**JSON Schema**
+
+* `response_format: { type: ""json_schema"", json_schema: {""schema"": object} }` .
+
+* The schema should be a valid JSON schema object.
+
+**Regex** (only available for `sonar` right now)
+
+* `response_format: { type: ""regex"", regex: {""regex"": str} }` .
+
+* The regex is a regular expression string.
+
+We recommend to give the LLM some hints about the output format in the prompts.
+
+## Examples
+
+### 1. Get a response in JSON format
+
+**Request**
+
+```python
+import requests
+from pydantic import BaseModel
+
+class AnswerFormat(BaseModel):
+    first_name: str
+    last_name: str
+    year_of_birth: int
+    num_seasons_in_nba: int
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""Be precise and concise.""},
+        {""role"": ""user"", ""content"": (
+            ""Tell me about Michael Jordan. ""
+            ""Please output a JSON object containing the following fields: ""
+            ""first_name, last_name, year_of_birth, num_seasons_in_nba. ""
+        )},
+    ],
+    ""response_format"": {
+		    ""type"": ""json_schema"",
+        ""json_schema"": {""schema"": AnswerFormat.model_json_schema()},
+    },
+}
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Response**
+**Pro-tip**: Use `high` for research-heavy or nuanced queries where coverage matters more than cost.
+
+⸻
+
+
+# Search Domain Filter Guide
+Source: https://docs.perplexity.ai/guides/search-domain-filters
+
+<Note>
+  The `search_domain_filter` feature allows you to limit search results to specific domains or exclude certain domains from search results.
+</Note>
+
+<Warning>
+  You can add a maximum of 10 domains to the `search_domain_filter` list.
+</Warning>
+
+## Overview
+
+The `search_domain_filter` parameter allows you to control which websites are included in or excluded from the search results used by the Sonar models. This feature is particularly useful when you want to:
+
+* Restrict search results to trusted sources
+* Filter out specific domains from search results
+* Focus research on particular websites
+
+Enabling domain filtering can be done by adding a `search_domain_filter` field in the request:
+
+```
+""search_domain_filter"": [
+  ""<domain1>"",
+  ""<domain2>"",
+  ...
+]
+```
+
+Each entry in the list should be a simple domain name. To exclude a domain, prefix it with a minus sign (`-`).
+
+## Examples
+
+### 1. Allowlist Specific Domains
+
+This example shows how to limit search results to only include content from specific domains.
+
+**Request**
+
+```python
+import requests
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar-reasoning-pro"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""You are a helpful assistant.""},
+        {""role"": ""user"", ""content"": ""Tell me about the James Webb Space Telescope discoveries.""}
+    ],
+    ""search_domain_filter"": [
+        ""nasa.gov"",
+        ""wikipedia.org"",
+        ""space.com""
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Best Practice**: Use simple domain names (e.g., `wikipedia.org`) without additional elements like `https://` or `www.` prefixes.
+
+### 2. Denylist Specific Domains
+
+This example shows how to exclude specific domains from search results by prefixing the domain name with a minus sign (`-`).
+
+**Request**
+
+```python
+import requests
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar-deep-research"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""You are a helpful assistant.""},
+        {""role"": ""user"", ""content"": ""What are the latest advancements in renewable energy?""}
+    ],
+    ""search_domain_filter"": [
+        ""-pinterest.com"",
+        ""-reddit.com"",
+        ""-quora.com""
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Best Practice**: Use simple domain names with a minus prefix (e.g., `-pinterest.com`) to exclude domains from search results.
+
+## Best Practices
+
+### Domain Specification
+<Accordion title=""What are the limitations to the number of API calls?"">
+    You can find our [rate limits here](https://docs.perplexity.ai/guides/usage-tiers).
+  </Accordion>
+
+  <Accordion title=""What's the best way to stay up to date with API updates?"">
+    We email users about new developments and also post in the [changelog](/changelog.mdx).
+  </Accordion>
+
+  <Accordion title=""How should I respond to 401: Authorization errors?"">
+    401 error codes indicate that the provided API key is invalid, deleted, or belongs to an account which ran out of credits. You likely need to purchase more credits in the [Perplexity API dashboard](https://perplexity.ai/settings/api). You can avoid this issue by configuring auto-top-up.
+  </Accordion>
+
+  <Accordion title=""Do you support fine-tuning?"">
+    Currently, we do not support fine-tuning.
+  </Accordion>
+
+  <Accordion title=""I have another question or an issue"">
+    Please reach out to [api@perplexity.ai](mailto:api@perplexity.ai) or [support@perplexity.ai](mailto:support@perplexity.ai) for other API inquiries. You can also post on our [discussion forum](https://github.com/ppl-ai/api-discussion/discussions) and we will get back to you.
+  </Accordion>
+
+  <Accordion title=""Does Perplexity provide service quality assurances such as service uptime, frequency of failures, and target recovery time in the event of a failure?"">
+    We do not guarantee this at the moment.
+  </Accordion>
+
+  <Accordion title=""Where are your DeepSeek reasoning models behind Sonar Reasoning and Sonar Reasoning Pro hosted? Is my data going to China?"">
+    The models are hosted in the US and we do not train on any of your data. And no, your data is not going to China.
+  </Accordion>
+
+  <Accordion title=""Are your reasoning APIs that use DeepSeek uncensored?"">
+    Yes, our reasoning APIs that use DeepSeek's models are uncensored and on par with the other APIs in terms of content moderation.
+  </Accordion>
+
+  <Accordion title=""Do you expose CoTs if I use your reasoning APIs or Deep Research API?"">
+    We expose the CoTs for Sonar Reasoning Pro and Sonar Reasoning. We don't currently expose the CoTs for Deep Research.
+  </Accordion>
+
+  <Accordion title=""Does R1-1776 search the web?"">
+    R1-1776 is an offline chat model that does not search the web. So this model might not have the most up-to-date information beyond its training cutoff date—which should be the same as R1.
+  </Accordion>
+
+  <Accordion title=""Are the reasoning tokens in Deep Research same as CoTs in the answer?"">
+    Reasoning tokens in Deep Research are a bit different than the CoTs in the answer—these tokens are used to reason through the research material before generating the final output via the CoTs.
+  </Accordion>
+
+  <Accordion title=""Is the internet data access provided by the API identical to that of Perplexity's web interface?"">
+    Yes, the API offers exactly the same internet data access as Perplexity's web platform.
+  </Accordion>
+<Tab title=""Tier 2"">
+    | Model                 | Requests per minute (RPM) | Beta Features                                                       |
+    | --------------------- | ------------------------- | ------------------------------------------------------------------- |
+    | `sonar-deep-research` | 20                        | related questions, structured outputs                               |
+    | `sonar-reasoning-pro` | 500                       | images, related questions, search domain filter, structured outputs |
+    | `sonar-reasoning`     | 500                       | images, related questions, search domain filter, structured outputs |
+    | `sonar-pro`           | 500                       | images, related questions, search domain filter, structured outputs |
+    | `sonar`               | 500                       | images, related questions, search domain filter, structured outputs |
+    | `r1-1776`             | 500                       | structured outputs                                                  |
+  </Tab>
+
+  <Tab title=""Tier 3"">
+    | Model                 | Requests per minute (RPM) | Beta Features                                                       |
+    | --------------------- | ------------------------- | ------------------------------------------------------------------- |
+    | `sonar-deep-research` | 40                        | related questions, structured outputs                               |
+    | `sonar-reasoning-pro` | 1000                      | images, related questions, search domain filter, structured outputs |
+    | `sonar-reasoning`     | 1000                      | images, related questions, search domain filter, structured outputs |
+    | `sonar-pro`           | 1000                      | images, related questions, search domain filter, structured outputs |
+    | `sonar`               | 1000                      | images, related questions, search domain filter, structured outputs |
+    | `r1-1776`             | 1000                      | structured outputs                                                  |
+  </Tab>
+
+  <Tab title=""Tier 4"">
+    | Model                 | Requests per minute (RPM) | Beta Features                                                       |
+    | --------------------- | ------------------------- | ------------------------------------------------------------------- |
+    | `sonar-deep-research` | 60                        | related questions, structured outputs                               |
+    | `sonar-reasoning-pro` | 2000                      | images, related questions, search domain filter, structured outputs |
+    | `sonar-reasoning`     | 2000                      | images, related questions, search domain filter, structured outputs |
+    | `sonar-pro`           | 2000                      | images, related questions, search domain filter, structured outputs |
+    | `sonar`               | 2000                      | images, related questions, search domain filter, structured outputs |
+    | `r1-1776`             | 2000                      | structured outputs                                                  |
+  </Tab>",FAITHFUL,"The text accurately reflects information from the source, which states that adding domain filters may slightly increase response time due to the need for additional filtering.",non-contradictory,"The answer states that adding domain filters may slightly increase the response time due to the need for additional filtering, which aligns with the reference that mentions an increase in response time due to filtering. There is no factual contradiction between the two statements."
+What are the implications of using subdomains versus main domains in domain filtering?,"Using subdomains versus main domains in domain filtering can significantly impact search results. 
+
+1. **Specificity**: Subdomains (e.g., `blog.example.com`) may lead to more targeted content related to that specific subdomain, while using the main domain (e.g., `example.com`) filters results from all its subdomains, providing a broader range of content from the entire domain.
+
+2. **Inclusion/Exclusion**: Specifying the main domain allows filtering out all subdomains uniformly; however, using subdomains may lead to excluding relevant content from the main domain.
+
+3. **Search Quality**: Main domains often capture a wider variety of information and resources, potentially improving the overall quality of search responses compared to filtering down to one subdomain.
+
+Overall, the choice between using main domains and subdomains should align with the desired specificity and breadth of information in the search results.","Using subdomains versus main domains in domain filtering has specific implications:
+
+1. **Scope of Filtering**:
+   - **Main Domains**: When you filter by a main domain (e.g., `example.com`), all subdomains (like `blog.example.com` or `shop.example.com`) are included automatically. This can be useful if you want to encompass all content associated with a primary domain.
+   - **Subdomains**: If you specify a subdomain (e.g., `blog.example.com`), only that subdomain will be included or excluded. This allows for more granular control but may limit the range of results if other relevant content resides in the main domain or other subdomains.
+
+2. **Content Availability**:
+   - Filtering using only the main domain may yield more comprehensive results, as it captures all content under that domain, potentially providing richer information on a topic.
+   - Conversely, filtering by a specific subdomain could lead to a lack of diverse perspectives or information if the needed data is hosted elsewhere within the domain.
+
+3. **Performance Considerations**:
+   - Using broader main domains may increase response times slightly due to the wider net being cast during searches, but it generally provides a better overall context for research-heavy queries.
+   - Narrowing focus to subdomains can improve relevance for specific inquiries but may also reduce the quantity of available results.
+
+4. **Best Practices**:
+   - It is typically advised to utilize main domains unless there is a clear reason to limit searches to specific subdomains (e.g., excluding unwanted content from a broader domain).
+
+In summary, deciding between main domains and subdomains in filtering needs careful consideration of the scope, relevance, and potential exposure to different types of content.","**Pro-tip**: Use `high` for research-heavy or nuanced queries where coverage matters more than cost.
+
+⸻
+
+
+# Search Domain Filter Guide
+Source: https://docs.perplexity.ai/guides/search-domain-filters
+
+<Note>
+  The `search_domain_filter` feature allows you to limit search results to specific domains or exclude certain domains from search results.
+</Note>
+
+<Warning>
+  You can add a maximum of 10 domains to the `search_domain_filter` list.
+</Warning>
+
+## Overview
+
+The `search_domain_filter` parameter allows you to control which websites are included in or excluded from the search results used by the Sonar models. This feature is particularly useful when you want to:
+
+* Restrict search results to trusted sources
+* Filter out specific domains from search results
+* Focus research on particular websites
+
+Enabling domain filtering can be done by adding a `search_domain_filter` field in the request:
+
+```
+""search_domain_filter"": [
+  ""<domain1>"",
+  ""<domain2>"",
+  ...
+]
+```
+
+Each entry in the list should be a simple domain name. To exclude a domain, prefix it with a minus sign (`-`).
+
+## Examples
+
+### 1. Allowlist Specific Domains
+
+This example shows how to limit search results to only include content from specific domains.
+
+**Request**
+
+```python
+import requests
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar-reasoning-pro"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""You are a helpful assistant.""},
+        {""role"": ""user"", ""content"": ""Tell me about the James Webb Space Telescope discoveries.""}
+    ],
+    ""search_domain_filter"": [
+        ""nasa.gov"",
+        ""wikipedia.org"",
+        ""space.com""
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Best Practice**: Use simple domain names (e.g., `wikipedia.org`) without additional elements like `https://` or `www.` prefixes.
+
+### 2. Denylist Specific Domains
+
+This example shows how to exclude specific domains from search results by prefixing the domain name with a minus sign (`-`).
+
+**Request**
+
+```python
+import requests
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar-deep-research"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""You are a helpful assistant.""},
+        {""role"": ""user"", ""content"": ""What are the latest advancements in renewable energy?""}
+    ],
+    ""search_domain_filter"": [
+        ""-pinterest.com"",
+        ""-reddit.com"",
+        ""-quora.com""
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Best Practice**: Use simple domain names with a minus prefix (e.g., `-pinterest.com`) to exclude domains from search results.
+
+## Best Practices
+
+### Domain Specification
+**Good Example**: ""Compare the energy efficiency ratings of heat pumps vs. traditional HVAC systems for residential use""
+
+    **Poor Example**: ""Tell me which home heating is better""
+  </Card>
+
+  <Card title=""Provide Relevant Context"">
+    Include critical context to guide the web search toward the most relevant content, but keep prompts concise and focused.
+
+    **Good Example**: ""Explain the impact of the 2023 EU digital markets regulations on app store competition for small developers""
+
+    **Poor Example**: ""What are the rules for app stores?""
+  </Card>
+</CardGroup>
+
+## Web Search Model Pitfalls to Avoid
+
+<CardGroup cols={2}>
+  <Card title=""Overly Generic Questions"">
+    Generic prompts lead to scattered web search results and unfocused responses. Always narrow your scope.
+
+    **Avoid**: ""What's happening in AI?""
+
+    **Instead**: ""What are the three most significant commercial applications of generative AI in healthcare in the past year?""
+  </Card>
+
+  <Card title=""Traditional LLM Techniques"">
+    Prompting strategies designed for traditional LLMs often don't work well with web search models. Adapt your approach accordingly.
+
+    **Avoid**: ""Act as an expert chef and give me a recipe for sourdough bread. Start by explaining the history of sourdough, then list ingredients, then...""
+
+    **Instead**: ""What's a reliable sourdough bread recipe for beginners? Include ingredients and step-by-step instructions.""
+  </Card>
+
+  <Card title=""Complex Multi-Part Requests"">
+    Complex prompts with multiple unrelated questions can confuse the search component. Focus on one topic per query.
+
+    **Avoid**: ""Explain quantum computing, and also tell me about regenerative agriculture, and provide stock market predictions.""
+
+    **Instead**: ""Explain quantum computing principles that might impact cryptography in the next decade.""
+  </Card>
+
+  <Card title=""Assuming Search Intent"">
+    Don't assume the model will search for what you intended without specific direction. Be explicit about exactly what information you need.
+
+    **Avoid**: ""Tell me about the latest developments.""
+
+    **Instead**: ""What are the latest developments in offshore wind energy technology announced in the past 6 months?""
+  </Card>
+</CardGroup>
+
+### Advanced Techniques
+
+<Tip>
+  We recommend for users *not* to tune language parameters such as `temperature`, as the default settings for these have already been optimized.
+</Tip>
+
+<CardGroup cols={1}>
+  <Card title=""Parameter Optimization"">
+    Adjust model parameters based on your specific needs:
+
+    * **Search Domain Filter**: Limit results to trusted sources for research-heavy queries.
+    * **Search Context Size**: Use ""high"" for comprehensive research questions and ""low"" for simple factual queries.
+
+    Example configuration for technical documentation:
+
+    ```json
+    {
+      ""search_domain_filter"": [""wikipedia.org"", ""docs.python.org""],
+      ""web_search_options"": {
+        ""search_context_size"": ""medium""
+      }
+    }
+    ```
+  </Card>
+</CardGroup>
+
+### Tips for Different Query Types
+⸻
+
+## Examples
+
+### 1. Exclude Specific Image Domains
+
+This request filters out images from Getty Images.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_domain_filter"": [""-gettyimages.com""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me images of Mount Everest""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_domain_filter"": [""-gettyimages.com""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me images of Mount Everest""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+### 2. Only Return GIFs
+
+This request restricts results to GIF images.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_format_filter"": [""gif""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me a funny cat gif""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_format_filter"": [""gif""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me a funny cat gif""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+## 3. Combine Domain and Format Filters
+
+You can combine both filters for precise control.
+
+<CodeGroup>
+  ```cURL cURL
+  curl --request POST \
+    --url https://api.perplexity.ai/chat/completions \
+    --header 'Authorization: Bearer YOUR_API_KEY' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      ""model"": ""sonar"",
+      ""return_images"": true,
+      ""image_domain_filter"": [""-gettyimages.com""],
+      ""image_format_filter"": [""gif""],
+      ""messages"": [
+        {""role"": ""user"", ""content"": ""Show me a gif of a dog""}
+      ]
+    }'
+  ```
+
+  ```python python
+  import requests
+
+  url = ""https://api.perplexity.ai/chat/completions""
+  headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+  payload = {
+    ""model"": ""sonar"",
+    ""return_images"": True,
+    ""image_domain_filter"": [""-gettyimages.com""],
+    ""image_format_filter"": [""gif""],
+    ""messages"": [
+      {""role"": ""user"", ""content"": ""Show me a gif of a dog""}
+    ]
+  }
+
+  response = requests.post(url, headers=headers, json=payload).json()
+  print(response[""choices""][0][""message""][""content""])
+  ```
+</CodeGroup>
+
+⸻
+
+## Best Practices
+**Best Practice**: Use simple domain names with a minus prefix (e.g., `-pinterest.com`) to exclude domains from search results.
+
+## Best Practices
+
+### Domain Specification
+
+* **Use simple domain names**: Specify domains in their simplest form (e.g., `example.com`) without protocol prefixes (`http://`, `https://`) or subdomain specifiers (`www.`).
+* **Main domains only**: Using the main domain (e.g., `nytimes.com`) will filter all subdomains as well.
+
+### Filter Optimization
+
+* **Be specific**: Use domains that are most relevant to your query to get the best results.
+* **Combine approaches**: You can mix inclusion and exclusion in the same request (e.g., `[""wikipedia.org"", ""-pinterest.com""]`).
+* **Limit filter size**: Although you can add up to 10 domains, using fewer, more targeted domains often yields better results.
+
+### Performance Considerations
+
+* Adding domain filters may slightly increase response time as the search engine needs to apply additional filtering.
+* Overly restrictive domain filters might result in fewer search results, potentially affecting the quality of the response.
+
+
+# Structured Outputs Guide
+Source: https://docs.perplexity.ai/guides/structured-outputs
+
+<Info>
+  The first request with a new JSON Schema or Regex expects to incur delay on the first token. Typically, it takes 10 to 30 seconds to prepare the new schema, and may result in timeout errors. Once the schema has been prepared, the subsequent requests will not see such delay.
+</Info>
+
+## Overview
+
+We currently support two types of structured outputs: **JSON Schema** and **Regex**. LLM responses will work to match the specified format, except for the following cases:
+
+* The output exceeds `max_tokens`
+
+Enabling the structured outputs can be done by adding a `response_format` field in the request:
+
+**JSON Schema**
+
+* `response_format: { type: ""json_schema"", json_schema: {""schema"": object} }` .
+
+* The schema should be a valid JSON schema object.
+
+**Regex** (only available for `sonar` right now)
+
+* `response_format: { type: ""regex"", regex: {""regex"": str} }` .
+
+* The regex is a regular expression string.
+
+We recommend to give the LLM some hints about the output format in the prompts.
+
+## Examples
+
+### 1. Get a response in JSON format
+
+**Request**
+
+```python
+import requests
+from pydantic import BaseModel
+
+class AnswerFormat(BaseModel):
+    first_name: str
+    last_name: str
+    year_of_birth: int
+    num_seasons_in_nba: int
+
+url = ""https://api.perplexity.ai/chat/completions""
+headers = {""Authorization"": ""Bearer YOUR_API_KEY""}
+payload = {
+    ""model"": ""sonar"",
+    ""messages"": [
+        {""role"": ""system"", ""content"": ""Be precise and concise.""},
+        {""role"": ""user"", ""content"": (
+            ""Tell me about Michael Jordan. ""
+            ""Please output a JSON object containing the following fields: ""
+            ""first_name, last_name, year_of_birth, num_seasons_in_nba. ""
+        )},
+    ],
+    ""response_format"": {
+		    ""type"": ""json_schema"",
+        ""json_schema"": {""schema"": AnswerFormat.model_json_schema()},
+    },
+}
+response = requests.post(url, headers=headers, json=payload).json()
+print(response[""choices""][0][""message""][""content""])
+```
+
+**Response**
+3. The invited user will receive an email with a link to join your group.
+
+### Filtering Members by Role
+
+Use the dropdown to filter your list of team members by role.
+
+![Filter Members by Role](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/filter_members_by_role.png)
+
+### Roles
+
+* **Admin**: Full access to invite/remove members, manage billing, and view usage data.
+* **Member**: Can view usage and account limits but cannot modify settings.
+
+<Warning>
+  Only Admins can make changes to billing and member permissions.
+</Warning>
+
+***
+
+## Billing and Payment Methods
+
+Admins can manage billing under the **API Billing** tab. This includes:
+
+* Adding or updating credit card information
+* Enabling or disabling auto-reload
+* Viewing invoice history and usage tier
+
+![API Billing](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/api_billing.png)
+
+* Register your credit card to get started
+
+<Note>
+  This step will not charge your credit card. It just stores payment information for later API usage.
+</Note>
+
+***
+
+## Viewing Usage Metrics
+
+All members can view API usage by selecting **Usage Metrics** from the sidebar.
+
+Features include:
+
+* Total API call trends over time
+* Breakdown by API model and key
+* Optional date range filters
+
+<Check>
+  Usage metrics help you monitor API activity and optimize for cost or performance.
+</Check>
+
+***
+
+## Viewing Rate Limits and Tiers
+
+You can view your API rate limits and organization tier under the **Usage Tier** section in the billing view.
+
+Details shown:
+
+* Current rate limits per API
+* Tier level
+
+***
+
+## Managing API Keys
+
+<Info>
+  The API key is a long-lived access token that can be used until it is manually refreshed or deleted.
+</Info>
+
+* Every API call needs a valid API key. You must send the API key as a bearer token in the Authorization header with each API request.
+
+Admins can generate and revoke API keys from the **API Keys** tab.
+
+### To create a key:
+
+* Click **+ Create Key** to generate a new API key.
+
+![Generate API Keys](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/generate_api_keys.png)
+
+<Warning>
+  API keys are sensitive credentials. Never expose them in client-side code or share them in public repositories.
+</Warning>
+
+<Warning>
+  If you run out of credits, your API keys will be blocked until you add to your credit balance. You can avoid this by configuring ""Automatic Top Up"", which refreshes your balance whenever you drop below \$2.
+</Warning>
+
+![Auto Reload](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/auto_reload.png)
+
+
+# Perplexity Crawlers
+Source: https://docs.perplexity.ai/guides/bots
+
+We strive to improve our service every day by delivering the best search experience possible. To achieve this, we collect data using web crawlers (“robots”) and user agents that gather and index information from the internet, operating either automatically or in response to user requests. Webmasters can use the following robots.txt tags to manage how their sites and content interact with Perplexity. Each setting works independently, and it may take up to 24 hours for our systems to reflect changes.",UNFAITHFUL,"The text provided discusses the implications of using main domains versus subdomains in domain filtering, which while potentially related to the source content, makes assumptions and adds interpretations that are not explicitly found in the source. The source does mention using main domains and provides best practices, but it does not discuss the specific implications, content availability, or performance considerations in the way the text does. Therefore, the text adds new interpretations and information that are not present in the source.",non-contradictory,"The ANSWER discusses the implications of using subdomains versus main domains in domain filtering, highlighting aspects like scope, content availability, performance considerations, and best practices. This aligns with the REFERENCE, which also addresses specificity, inclusion/exclusion, and search quality without presenting any contradictory information."
+What are the characteristics of the `PerplexityBot` user agent as described in the context?,"The `PerplexityBot` user agent is designed to surface and link websites in search results on Perplexity. It is not used for crawling content for AI foundation models. Its recommendation is to be allowed in the site's `robots.txt` file to ensure visibility in search results. The full user-agent string is `Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; PerplexityBot/1.0; +https://perplexity.ai/perplexitybot)`.","The `PerplexityBot` user agent is designed to surface and link websites in search results on Perplexity. It is not used for crawling content for AI foundation models. Website owners can ensure their sites appear in search results by allowing `PerplexityBot` in their site’s `robots.txt` file. It operates under the full user-agent string: 
+
+```
+Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; PerplexityBot/1.0; +https://perplexity.ai/perplexitybot)
+```
+
+Additionally, it has published IP ranges that can be referenced in a JSON format.","| User Agent      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| :-------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PerplexityBot   | `PerplexityBot` is designed to surface and link websites in search results on Perplexity. It is not used to crawl content for AI foundation models. To ensure your site appears in search results, we recommend allowing `PerplexityBot` in your site’s `robots.txt` file and permitting requests from our published IP ranges listed below.<br /><br />Full user-agent string: `Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; PerplexityBot/1.0; +https://perplexity.ai/perplexitybot)`<br /><br />Published IP addresses: [https://www.perplexity.com/perplexitybot.json](https://www.perplexity.com/perplexitybot.json)                                                                                                                                        |
+| Perplexity‑User | `Perplexity-User` supports user actions within Perplexity. When users ask Perplexity a question, it might visit a web page to help provide an accurate answer and include a link to the page in its response. `Perplexity-User` controls which sites these user requests can access. It is not used for web crawling or to collect content for training AI foundation models.<br /><br />Full user-agent string: `Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Perplexity-User/1.0; +https://perplexity.ai/perplexity-user)`<br /><br />Published IP addresses: [https://www.perplexity.com/perplexity-user.json](https://www.perplexity.com/perplexity-user.json)<br /><br />Since a user requested the fetch, this fetcher generally ignores robots.txt rules. |
+
+
+# Sonar Cookbook
+Source: https://docs.perplexity.ai/guides/cookbook
+<Accordion title=""What are the limitations to the number of API calls?"">
+    You can find our [rate limits here](https://docs.perplexity.ai/guides/usage-tiers).
+  </Accordion>
+
+  <Accordion title=""What's the best way to stay up to date with API updates?"">
+    We email users about new developments and also post in the [changelog](/changelog.mdx).
+  </Accordion>
+
+  <Accordion title=""How should I respond to 401: Authorization errors?"">
+    401 error codes indicate that the provided API key is invalid, deleted, or belongs to an account which ran out of credits. You likely need to purchase more credits in the [Perplexity API dashboard](https://perplexity.ai/settings/api). You can avoid this issue by configuring auto-top-up.
+  </Accordion>
+
+  <Accordion title=""Do you support fine-tuning?"">
+    Currently, we do not support fine-tuning.
+  </Accordion>
+
+  <Accordion title=""I have another question or an issue"">
+    Please reach out to [api@perplexity.ai](mailto:api@perplexity.ai) or [support@perplexity.ai](mailto:support@perplexity.ai) for other API inquiries. You can also post on our [discussion forum](https://github.com/ppl-ai/api-discussion/discussions) and we will get back to you.
+  </Accordion>
+
+  <Accordion title=""Does Perplexity provide service quality assurances such as service uptime, frequency of failures, and target recovery time in the event of a failure?"">
+    We do not guarantee this at the moment.
+  </Accordion>
+
+  <Accordion title=""Where are your DeepSeek reasoning models behind Sonar Reasoning and Sonar Reasoning Pro hosted? Is my data going to China?"">
+    The models are hosted in the US and we do not train on any of your data. And no, your data is not going to China.
+  </Accordion>
+
+  <Accordion title=""Are your reasoning APIs that use DeepSeek uncensored?"">
+    Yes, our reasoning APIs that use DeepSeek's models are uncensored and on par with the other APIs in terms of content moderation.
+  </Accordion>
+
+  <Accordion title=""Do you expose CoTs if I use your reasoning APIs or Deep Research API?"">
+    We expose the CoTs for Sonar Reasoning Pro and Sonar Reasoning. We don't currently expose the CoTs for Deep Research.
+  </Accordion>
+
+  <Accordion title=""Does R1-1776 search the web?"">
+    R1-1776 is an offline chat model that does not search the web. So this model might not have the most up-to-date information beyond its training cutoff date—which should be the same as R1.
+  </Accordion>
+
+  <Accordion title=""Are the reasoning tokens in Deep Research same as CoTs in the answer?"">
+    Reasoning tokens in Deep Research are a bit different than the CoTs in the answer—these tokens are used to reason through the research material before generating the final output via the CoTs.
+  </Accordion>
+
+  <Accordion title=""Is the internet data access provided by the API identical to that of Perplexity's web interface?"">
+    Yes, the API offers exactly the same internet data access as Perplexity's web platform.
+  </Accordion>
+3. The invited user will receive an email with a link to join your group.
+
+### Filtering Members by Role
+
+Use the dropdown to filter your list of team members by role.
+
+![Filter Members by Role](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/filter_members_by_role.png)
+
+### Roles
+
+* **Admin**: Full access to invite/remove members, manage billing, and view usage data.
+* **Member**: Can view usage and account limits but cannot modify settings.
+
+<Warning>
+  Only Admins can make changes to billing and member permissions.
+</Warning>
+
+***
+
+## Billing and Payment Methods
+
+Admins can manage billing under the **API Billing** tab. This includes:
+
+* Adding or updating credit card information
+* Enabling or disabling auto-reload
+* Viewing invoice history and usage tier
+
+![API Billing](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/api_billing.png)
+
+* Register your credit card to get started
+
+<Note>
+  This step will not charge your credit card. It just stores payment information for later API usage.
+</Note>
+
+***
+
+## Viewing Usage Metrics
+
+All members can view API usage by selecting **Usage Metrics** from the sidebar.
+
+Features include:
+
+* Total API call trends over time
+* Breakdown by API model and key
+* Optional date range filters
+
+<Check>
+  Usage metrics help you monitor API activity and optimize for cost or performance.
+</Check>
+
+***
+
+## Viewing Rate Limits and Tiers
+
+You can view your API rate limits and organization tier under the **Usage Tier** section in the billing view.
+
+Details shown:
+
+* Current rate limits per API
+* Tier level
+
+***
+
+## Managing API Keys
+
+<Info>
+  The API key is a long-lived access token that can be used until it is manually refreshed or deleted.
+</Info>
+
+* Every API call needs a valid API key. You must send the API key as a bearer token in the Authorization header with each API request.
+
+Admins can generate and revoke API keys from the **API Keys** tab.
+
+### To create a key:
+
+* Click **+ Create Key** to generate a new API key.
+
+![Generate API Keys](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/generate_api_keys.png)
+
+<Warning>
+  API keys are sensitive credentials. Never expose them in client-side code or share them in public repositories.
+</Warning>
+
+<Warning>
+  If you run out of credits, your API keys will be blocked until you add to your credit balance. You can avoid this by configuring ""Automatic Top Up"", which refreshes your balance whenever you drop below \$2.
+</Warning>
+
+![Auto Reload](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/auto_reload.png)
+
+
+# Perplexity Crawlers
+Source: https://docs.perplexity.ai/guides/bots
+
+We strive to improve our service every day by delivering the best search experience possible. To achieve this, we collect data using web crawlers (“robots”) and user agents that gather and index information from the internet, operating either automatically or in response to user requests. Webmasters can use the following robots.txt tags to manage how their sites and content interact with Perplexity. Each setting works independently, and it may take up to 24 hours for our systems to reflect changes.
+<Card title=""Knowledge Base"" icon=""book"" iconType=""solid"">
+    Explore tutorials, FAQs, and best practices from our team and community contributors. [Browse resources](https://github.com/ppl-ai/api-discussion/)
+  </Card>
+</CardGroup>
+
+## Community Guidelines
+
+We're committed to fostering an inclusive, helpful, and respectful community. Please follow these guidelines in all interactions:
+
+1. **Be respectful** - Treat everyone with courtesy and professionalism
+2. **Be constructive** - Provide helpful feedback and solutions
+3. **Share knowledge** - Help others learn and grow
+4. **Stay on topic** - Keep discussions relevant to the Perplexity API
+5. **No spam or self-promotion** - Share your work in appropriate channels
+
+
+# Frequently Asked Questions
+Source: https://docs.perplexity.ai/faq/faq
+
+<AccordionGroup>
+  <Accordion title=""Why isn't the `response_format` parameter working for reasoning models?"">
+    The `sonar-reasoning-pro` model is designed to output a `<think>` section containing reasoning tokens, immediately followed by a valid JSON object. As a result, the `response_format` parameter does not remove these reasoning tokens from the output.
+
+    We recommend using a custom parser to extract the valid JSON portion. An example implementation can be found [here](https://github.com/ppl-ai/api-discussion/blob/main/utils/extract_json_reasoning_models.py).
+  </Accordion>
+
+  <Accordion title=""Does the API use content filtering or SafeSearch?"">
+    Yes, for the API, content filtering in the form of SafeSearch is turned on by default. This helps filter out potentially offensive and inappropriate content, including pornography, from search results. SafeSearch is an automated filter that works across search results to provide a safer experience. You can learn more about SafeSearch on the [official Wikipedia page](https://en.wikipedia.org/wiki/SafeSearch).
+  </Accordion>
+
+  <Accordion title=""How do I file a bug report and what happens afterward?"">
+    To file a bug report, please use our GitHub repository and file the bug in [issues](https://github.com/ppl-ai/api-discussion/issues). Once you've submitted your report, we kindly ask that you share the link to the issue with us via email at [api@perplexity.ai](mailto:api@perplexity.ai) so we can track it on our end.
+
+    We truly appreciate your patience, and we'll get back to you as soon as possible. Due to the current volume of reports, it may take a little time for us to respond—but rest assured, we're on it.
+  </Accordion>
+
+  <Accordion title=""Where are Perplexity's language models hosted?"">
+    Our compute is hosted via Amazon Web Services in North America. By default, the API has zero day retention of user prompt data, which is never used for AI training.
+  </Accordion>
+
+  <Accordion title=""How can I upgrade to the next usage tier?"">
+    The only way for an account to be upgraded to the next usage tier is through all-time credit purchase.
+
+    Here are the spending criteria associated with each tier:
+# Application Status
+Source: https://docs.perplexity.ai/system-status/system-status
+
+You can check the status of our services [here](https://status.perplexity.com/).
+
+If you experience any issues or have any questions, please contact us at [api@perplexity.ai](mailto:api@perplexity.ai) or flag a bug report in our [Discord](https://discord.com/invite/perplexity-ai) channel.",FAITHFUL,"The text accurately describes the purpose and operation of the `PerplexityBot` user agent as outlined in the source. It correctly states that `PerplexityBot` is designed to surface and link websites in search results, is not used for crawling content for AI foundation models, and mentions allowing `PerplexityBot` in the site's `robots.txt` file to ensure visibility. The user-agent string provided matches the source exactly, and it mentions the existence of published IP ranges without introducing any new or conflicting information.",non-contradictory,"The ANSWER restates the information from the REFERENCE regarding the purpose of the `PerplexityBot`, its operation, and the importance of being allowed in the `robots.txt` file. It adds new information about published IP ranges, which does not contradict the REFERENCE."
+What is the purpose of the `Perplexity-User` user agent in relation to user actions?,The purpose of the `Perplexity-User` user agent is to support user actions within Perplexity by allowing the system to visit web pages to help provide accurate answers to user queries and include links to those pages in responses. It controls which sites can be accessed based on user requests and is not used for web crawling or collecting content for AI model training.,"The `Perplexity-User` user agent is designed to support user actions within Perplexity. When users ask questions, this user agent may visit web pages to provide accurate answers and include links to those pages in its responses. It controls which sites these user requests can access but is not involved in web crawling or collecting content for training AI foundation models.","| User Agent      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| :-------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PerplexityBot   | `PerplexityBot` is designed to surface and link websites in search results on Perplexity. It is not used to crawl content for AI foundation models. To ensure your site appears in search results, we recommend allowing `PerplexityBot` in your site’s `robots.txt` file and permitting requests from our published IP ranges listed below.<br /><br />Full user-agent string: `Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; PerplexityBot/1.0; +https://perplexity.ai/perplexitybot)`<br /><br />Published IP addresses: [https://www.perplexity.com/perplexitybot.json](https://www.perplexity.com/perplexitybot.json)                                                                                                                                        |
+| Perplexity‑User | `Perplexity-User` supports user actions within Perplexity. When users ask Perplexity a question, it might visit a web page to help provide an accurate answer and include a link to the page in its response. `Perplexity-User` controls which sites these user requests can access. It is not used for web crawling or to collect content for training AI foundation models.<br /><br />Full user-agent string: `Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Perplexity-User/1.0; +https://perplexity.ai/perplexity-user)`<br /><br />Published IP addresses: [https://www.perplexity.com/perplexity-user.json](https://www.perplexity.com/perplexity-user.json)<br /><br />Since a user requested the fetch, this fetcher generally ignores robots.txt rules. |
+
+
+# Sonar Cookbook
+Source: https://docs.perplexity.ai/guides/cookbook
+3. The invited user will receive an email with a link to join your group.
+
+### Filtering Members by Role
+
+Use the dropdown to filter your list of team members by role.
+
+![Filter Members by Role](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/filter_members_by_role.png)
+
+### Roles
+
+* **Admin**: Full access to invite/remove members, manage billing, and view usage data.
+* **Member**: Can view usage and account limits but cannot modify settings.
+
+<Warning>
+  Only Admins can make changes to billing and member permissions.
+</Warning>
+
+***
+
+## Billing and Payment Methods
+
+Admins can manage billing under the **API Billing** tab. This includes:
+
+* Adding or updating credit card information
+* Enabling or disabling auto-reload
+* Viewing invoice history and usage tier
+
+![API Billing](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/api_billing.png)
+
+* Register your credit card to get started
+
+<Note>
+  This step will not charge your credit card. It just stores payment information for later API usage.
+</Note>
+
+***
+
+## Viewing Usage Metrics
+
+All members can view API usage by selecting **Usage Metrics** from the sidebar.
+
+Features include:
+
+* Total API call trends over time
+* Breakdown by API model and key
+* Optional date range filters
+
+<Check>
+  Usage metrics help you monitor API activity and optimize for cost or performance.
+</Check>
+
+***
+
+## Viewing Rate Limits and Tiers
+
+You can view your API rate limits and organization tier under the **Usage Tier** section in the billing view.
+
+Details shown:
+
+* Current rate limits per API
+* Tier level
+
+***
+
+## Managing API Keys
+
+<Info>
+  The API key is a long-lived access token that can be used until it is manually refreshed or deleted.
+</Info>
+
+* Every API call needs a valid API key. You must send the API key as a bearer token in the Authorization header with each API request.
+
+Admins can generate and revoke API keys from the **API Keys** tab.
+
+### To create a key:
+
+* Click **+ Create Key** to generate a new API key.
+
+![Generate API Keys](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/generate_api_keys.png)
+
+<Warning>
+  API keys are sensitive credentials. Never expose them in client-side code or share them in public repositories.
+</Warning>
+
+<Warning>
+  If you run out of credits, your API keys will be blocked until you add to your credit balance. You can avoid this by configuring ""Automatic Top Up"", which refreshes your balance whenever you drop below \$2.
+</Warning>
+
+![Auto Reload](https://mintlify.s3.us-west-1.amazonaws.com/perplexity/images/api_portal/auto_reload.png)
+
+
+# Perplexity Crawlers
+Source: https://docs.perplexity.ai/guides/bots
+
+We strive to improve our service every day by delivering the best search experience possible. To achieve this, we collect data using web crawlers (“robots”) and user agents that gather and index information from the internet, operating either automatically or in response to user requests. Webmasters can use the following robots.txt tags to manage how their sites and content interact with Perplexity. Each setting works independently, and it may take up to 24 hours for our systems to reflect changes.
+<Card title=""Knowledge Base"" icon=""book"" iconType=""solid"">
+    Explore tutorials, FAQs, and best practices from our team and community contributors. [Browse resources](https://github.com/ppl-ai/api-discussion/)
+  </Card>
+</CardGroup>
+
+## Community Guidelines
+
+We're committed to fostering an inclusive, helpful, and respectful community. Please follow these guidelines in all interactions:
+
+1. **Be respectful** - Treat everyone with courtesy and professionalism
+2. **Be constructive** - Provide helpful feedback and solutions
+3. **Share knowledge** - Help others learn and grow
+4. **Stay on topic** - Keep discussions relevant to the Perplexity API
+5. **No spam or self-promotion** - Share your work in appropriate channels
+
+
+# Frequently Asked Questions
+Source: https://docs.perplexity.ai/faq/faq
+
+<AccordionGroup>
+  <Accordion title=""Why isn't the `response_format` parameter working for reasoning models?"">
+    The `sonar-reasoning-pro` model is designed to output a `<think>` section containing reasoning tokens, immediately followed by a valid JSON object. As a result, the `response_format` parameter does not remove these reasoning tokens from the output.
+
+    We recommend using a custom parser to extract the valid JSON portion. An example implementation can be found [here](https://github.com/ppl-ai/api-discussion/blob/main/utils/extract_json_reasoning_models.py).
+  </Accordion>
+
+  <Accordion title=""Does the API use content filtering or SafeSearch?"">
+    Yes, for the API, content filtering in the form of SafeSearch is turned on by default. This helps filter out potentially offensive and inappropriate content, including pornography, from search results. SafeSearch is an automated filter that works across search results to provide a safer experience. You can learn more about SafeSearch on the [official Wikipedia page](https://en.wikipedia.org/wiki/SafeSearch).
+  </Accordion>
+
+  <Accordion title=""How do I file a bug report and what happens afterward?"">
+    To file a bug report, please use our GitHub repository and file the bug in [issues](https://github.com/ppl-ai/api-discussion/issues). Once you've submitted your report, we kindly ask that you share the link to the issue with us via email at [api@perplexity.ai](mailto:api@perplexity.ai) so we can track it on our end.
+
+    We truly appreciate your patience, and we'll get back to you as soon as possible. Due to the current volume of reports, it may take a little time for us to respond—but rest assured, we're on it.
+  </Accordion>
+
+  <Accordion title=""Where are Perplexity's language models hosted?"">
+    Our compute is hosted via Amazon Web Services in North America. By default, the API has zero day retention of user prompt data, which is never used for AI training.
+  </Accordion>
+
+  <Accordion title=""How can I upgrade to the next usage tier?"">
+    The only way for an account to be upgraded to the next usage tier is through all-time credit purchase.
+
+    Here are the spending criteria associated with each tier:
+<Accordion title=""What are the limitations to the number of API calls?"">
+    You can find our [rate limits here](https://docs.perplexity.ai/guides/usage-tiers).
+  </Accordion>
+
+  <Accordion title=""What's the best way to stay up to date with API updates?"">
+    We email users about new developments and also post in the [changelog](/changelog.mdx).
+  </Accordion>
+
+  <Accordion title=""How should I respond to 401: Authorization errors?"">
+    401 error codes indicate that the provided API key is invalid, deleted, or belongs to an account which ran out of credits. You likely need to purchase more credits in the [Perplexity API dashboard](https://perplexity.ai/settings/api). You can avoid this issue by configuring auto-top-up.
+  </Accordion>
+
+  <Accordion title=""Do you support fine-tuning?"">
+    Currently, we do not support fine-tuning.
+  </Accordion>
+
+  <Accordion title=""I have another question or an issue"">
+    Please reach out to [api@perplexity.ai](mailto:api@perplexity.ai) or [support@perplexity.ai](mailto:support@perplexity.ai) for other API inquiries. You can also post on our [discussion forum](https://github.com/ppl-ai/api-discussion/discussions) and we will get back to you.
+  </Accordion>
+
+  <Accordion title=""Does Perplexity provide service quality assurances such as service uptime, frequency of failures, and target recovery time in the event of a failure?"">
+    We do not guarantee this at the moment.
+  </Accordion>
+
+  <Accordion title=""Where are your DeepSeek reasoning models behind Sonar Reasoning and Sonar Reasoning Pro hosted? Is my data going to China?"">
+    The models are hosted in the US and we do not train on any of your data. And no, your data is not going to China.
+  </Accordion>
+
+  <Accordion title=""Are your reasoning APIs that use DeepSeek uncensored?"">
+    Yes, our reasoning APIs that use DeepSeek's models are uncensored and on par with the other APIs in terms of content moderation.
+  </Accordion>
+
+  <Accordion title=""Do you expose CoTs if I use your reasoning APIs or Deep Research API?"">
+    We expose the CoTs for Sonar Reasoning Pro and Sonar Reasoning. We don't currently expose the CoTs for Deep Research.
+  </Accordion>
+
+  <Accordion title=""Does R1-1776 search the web?"">
+    R1-1776 is an offline chat model that does not search the web. So this model might not have the most up-to-date information beyond its training cutoff date—which should be the same as R1.
+  </Accordion>
+
+  <Accordion title=""Are the reasoning tokens in Deep Research same as CoTs in the answer?"">
+    Reasoning tokens in Deep Research are a bit different than the CoTs in the answer—these tokens are used to reason through the research material before generating the final output via the CoTs.
+  </Accordion>
+
+  <Accordion title=""Is the internet data access provided by the API identical to that of Perplexity's web interface?"">
+    Yes, the API offers exactly the same internet data access as Perplexity's web platform.
+  </Accordion>
+# Application Status
+Source: https://docs.perplexity.ai/system-status/system-status
+
+You can check the status of our services [here](https://status.perplexity.com/).
+
+If you experience any issues or have any questions, please contact us at [api@perplexity.ai](mailto:api@perplexity.ai) or flag a bug report in our [Discord](https://discord.com/invite/perplexity-ai) channel.",FAITHFUL,"The text accurately describes the `Perplexity-User` user agent as supporting user actions, visiting web pages to provide accurate answers, controlling site access, and it correctly states that it is not involved in web crawling or content collection for training, consistent with the information provided in the source.",non-contradictory,"The provided text accurately reflects the content of the REFERENCE, stating that the `Perplexity-User` user agent supports user actions, visits web pages for accurate answers, controls site access based on user requests, and does not engage in web crawling or collecting content for AI training."

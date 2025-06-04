@@ -1,0 +1,25 @@
+_evidently_index,questions,answers
+0,What is the method for excluding specific domains from search results in the provided context?,"To exclude specific domains from search results, use the `search_domain_filter` parameter in your request and prefix the domain names with a minus sign (`-`). For example:
+
+```json
+""search_domain_filter"": [
+    ""-example.com""
+]
+```"
+1,Which libraries are imported in the example code for sending the API request?,The libraries imported in the example code for sending the API request are `openai` and `requests`.
+2,How should domain names be specified for optimal filtering of search results?,"For optimal filtering of search results using domain names, specify simple domain names (e.g., `example.com`) without protocol prefixes or subdomains. You can include up to 10 domains in your `search_domain_filter` list, mixing inclusion and exclusion by prefixing domains to exclude with a minus sign (e.g., `-pinterest.com`). Use domains that are most relevant to your query for better results, and consider limiting the number of domains for targeted filtering."
+3,What happens if overly restrictive domain filters are applied to a search request?,"Overly restrictive domain filters can lead to fewer search results, which may negatively impact the quality and relevance of the response."
+4,Can both inclusion and exclusion of domains be combined in the same API request?,"Yes, both inclusion and exclusion of domains can be combined in the same API request, such as using `[""wikipedia.org"", ""-pinterest.com""]`."
+5,How many domains can be added to the search domain filter according to the best practices?,You can add a maximum of 10 domains to the search domain filter.
+6,What increase in response time might occur due to filtering addition on domain requests?,"The increase in response time due to filtering addition on domain requests can be slight, as enabling domain filtering may involve more extensive search and reranking, particularly if a larger context size is used."
+7,What are the implications of using subdomains versus main domains in domain filtering?,"Using subdomains versus main domains in domain filtering can significantly impact search results. 
+
+1. **Specificity**: Subdomains (e.g., `blog.example.com`) may lead to more targeted content related to that specific subdomain, while using the main domain (e.g., `example.com`) filters results from all its subdomains, providing a broader range of content from the entire domain.
+
+2. **Inclusion/Exclusion**: Specifying the main domain allows filtering out all subdomains uniformly; however, using subdomains may lead to excluding relevant content from the main domain.
+
+3. **Search Quality**: Main domains often capture a wider variety of information and resources, potentially improving the overall quality of search responses compared to filtering down to one subdomain.
+
+Overall, the choice between using main domains and subdomains should align with the desired specificity and breadth of information in the search results."
+8,What are the characteristics of the `PerplexityBot` user agent as described in the context?,"The `PerplexityBot` user agent is designed to surface and link websites in search results on Perplexity. It is not used for crawling content for AI foundation models. Its recommendation is to be allowed in the site's `robots.txt` file to ensure visibility in search results. The full user-agent string is `Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; PerplexityBot/1.0; +https://perplexity.ai/perplexitybot)`."
+9,What is the purpose of the `Perplexity-User` user agent in relation to user actions?,The purpose of the `Perplexity-User` user agent is to support user actions within Perplexity by allowing the system to visit web pages to help provide accurate answers to user queries and include links to those pages in responses. It controls which sites can be accessed based on user requests and is not used for web crawling or collecting content for AI model training.

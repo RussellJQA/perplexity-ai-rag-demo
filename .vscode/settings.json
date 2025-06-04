@@ -1,0 +1,16 @@
+{
+    "cSpell.words": [
+        "colwidth",
+        "docstore",
+        "dotenv",
+        "Evals",
+        "FAISS",
+        "ipykernel",
+        "llms",
+        "vectorstores",
+        "venv"
+    ],
+    "python.analysis.typeCheckingMode": "basic",
+    "notebook.output.scrolling": true,
+    "notebook.output.textLineLimit": 10,
+}
