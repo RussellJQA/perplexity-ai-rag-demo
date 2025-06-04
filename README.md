@@ -1,5 +1,5 @@
 # PROJECT NAME: Perplexity.ai RAG demo
-## DESCRIPTION: Demo of a RAG (Retrieval Augmented Generated) system based on Perplexity.ai's llms-full.txt file
+## DESCRIPTION: Demo of a RAG (Retrieval-Augmented Generation) system based on Perplexity.ai's llms-full.txt file
 
 This is a simple demo ("toy") Q&A system about Perplexity.ai. Using [Evidently AI's cloud platform](https://app.evidently.cloud), I derived 10 reference (ground truth) answers from Perplexity.ai's published [llms-full.txt](https://docs.perplexity.ai/llms-full.txt) file. Then I evaluated the system's generated answers by 2 criteria:
 1. Whether they were faithful to the corresponding contexts from the source data (llms-full.txt)
